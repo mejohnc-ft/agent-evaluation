@@ -10,12 +10,16 @@ function fail(op: string, error: { message: string } | null): never {
   throw new StoreError(`${op} failed${error ? `: ${error.message}` : ""}`);
 }
 
-// Env is read here, not at module load, so the build needs no secrets.
-export function createSupabaseStore(): Store {
+// Service-role client, server-only. Env is read on call, not at module load, so builds need no secrets.
+export function serviceClient() {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) throw new StoreError("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set");
-  const db = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
+  return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
+}
+
+export function createSupabaseStore(): Store {
+  const db = serviceClient();
 
   return {
     async insertHandoff(row: HandoffRow) {

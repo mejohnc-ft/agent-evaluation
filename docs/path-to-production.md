@@ -32,10 +32,10 @@ The widget is a small script tag loading the chat in an iframe from this app, so
 
 ## Data and privacy
 
-- Personal details are stored only in `handoffs`; conversation logs keep content without contact details. TODO(you): confirm that's true in your implementation.
-- Retention: TODO(you): e.g. transcripts 90 days, handoffs per CRM policy.
+- Personal details are stored only in `handoffs`; conversation logs keep content without contact details. Verified in production QA (2026-10-12): 21 logged turns, none containing an email; `logTurn` redacts emails before insert.
+- Retention (D15): `conversation_turns` 90 days, `knowledge_gaps` 180 days, `rate_counters` 1 day, `handoffs` 12 months (the lead record until a CRM exists). A daily Vercel Cron calls `/api/cron/retention`, which is protected by `CRON_SECRET` and logs counts only.
 - Privacy notice: one line under the chat input linking to cadre.ai/legal/privacy-policy.
-- Deletion requests: delete by conversation id or email across both tables. TODO(you): script or runbook.
+- Deletion requests: `npm run delete-contact -- --email <address>` (or `--conversation <id>`) removes the person's handoffs and every conversation they were in, across `handoffs`, `knowledge_gaps` and `conversation_turns`. It prints counts only.
 
 ## Monitoring and operations
 

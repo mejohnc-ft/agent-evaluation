@@ -122,3 +122,10 @@ Template:
 - Rejected: CAPTCHA or press-and-hold (friction on every real visitor of a support chat); a full load test (out of proportion for a demo; a burst on Preview proves the guard paths).
 - Evidence: `src/lib/guards/bot-check.test.ts` red before the guard existed, green after (63 tests).
 - Revisit when: Deep Analysis is enabled in the Firewall, or bot traffic shows up in turn logs.
+
+## D15: Retention periods and deletion requests
+- Context: the bot stores turns, gaps, rate counters and handoffs; path-to-production.md promised retention and a deletion route without either existing.
+- Decision: `conversation_turns` 90 days, `knowledge_gaps` 180 days, `rate_counters` 1 day, `handoffs` 12 months. A daily Vercel Cron (`vercel.json`, 04:00 UTC) calls `/api/cron/retention` with `CRON_SECRET` (generated straight into Vercel, never printed). Deletion requests run `npm run delete-contact`. Both live in `src/lib/store/maintenance.ts`, separate from the chat `Store`, so the chat path can never delete.
+- Rejected: Supabase `pg_cron` (needs write access through the MCP, which is read-only by D12, and hides the job outside the repo); keeping everything indefinitely.
+- Evidence: `src/lib/retention.test.ts` (cutoffs and cron auth) red before the module existed, green after (67 tests).
+- Revisit when: Cadre states its own retention policy, or handoffs move to a CRM (then handoffs here can drop to 30 days).
