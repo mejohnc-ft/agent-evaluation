@@ -149,3 +149,10 @@ Template:
 - Rejected: letting the model write links that the UI turns into cards (the link filter would strip them, and the model would choose the URL).
 - Evidence: Tier 1 `case-studies-card` and `industry-card` 3/3 each; full suite 35/35.
 - Revisit when: Cadre adds pages (update `links.md` and the label list together).
+
+## D19: Cadre's brief is a source for partners, alongside cadre.ai
+- Context: the knowledge base used only cadre.ai page text, where most partners appear as logos (not claims). Cadre's take-home brief states its key partners in text: OpenAI, Anthropic (Claude), Google, Microsoft, AWS, Salesforce, Snowflake, plus OpenRouter. The bot hedged on Anthropic and named no others.
+- Decision: `knowledge/partners.md` states the partners "per Cadre AI's own brief", with the brief quoted verbatim as evidence, plus the homepage banner. "Official" stays reserved for OpenAI, the only partnership Cadre describes that way (D11 stands).
+- Rejected: counting homepage logos as claims (D11's reasoning still holds for unlabelled images); leaving partners out (the brief lists partners among the facts the bot should know).
+- Evidence: Tier 1 `partners` failed before the file existed (no partner beyond Anthropic named), passes after.
+- Revisit when: cadre.ai publishes a partners page (switch the source to it).

@@ -1,0 +1,17 @@
+[
+  {
+    "claim": "Per Cadre AI's own brief, Cadre's key partners are OpenAI, Anthropic (Claude), Google, Microsoft, AWS, Salesforce and Snowflake, plus OpenRouter for model access.",
+    "url": "brief:Cadre_AI_Chatbot_Take_Home_Candidate_v1.1.pdf (About Cadre AI table, Key partners)",
+    "snippet": "OpenAI, Anthropic (Claude), Google, Microsoft, AWS, Salesforce, Snowflake — plus OpenRouter for model access"
+  },
+  {
+    "claim": "The Cadre homepage banner reads \"Anthropic & OpenAI Partner\".",
+    "url": "https://cadre.ai/",
+    "snippet": "Anthropic & OpenAI Partner"
+  },
+  {
+    "claim": "Cadre was named an Official Service Partner of OpenAI.",
+    "url": "https://cadre.ai/articles/cadre-ai-selected-as-an-official-openai-service-partner",
+    "snippet": "Official Service Partner of OpenAI"
+  }
+]
