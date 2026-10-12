@@ -35,6 +35,7 @@ const GUARD: Record<Extract<AppEvent, { type: "guard_checked" }>["guard"], strin
   bot: "Bot check",
   rate_limit: "Rate limit",
   spend: "Spend limit",
+  price: "Price guard",
 };
 const OUTCOME = { pass: "passed", block: "blocked", skipped: "skipped" } as const;
 

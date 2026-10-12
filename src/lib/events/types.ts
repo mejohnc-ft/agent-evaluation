@@ -10,7 +10,7 @@ export const appEventSchema = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("guard_checked"),
     ...base,
-    guard: z.enum(["input_cap", "bot", "rate_limit", "spend"]),
+    guard: z.enum(["input_cap", "bot", "rate_limit", "spend", "price"]),
     outcome: z.enum(["pass", "block", "skipped"]),
   }),
   z.object({ type: z.literal("tool_called"), ...base, tool: z.string().min(1).max(60) }),
