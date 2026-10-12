@@ -60,7 +60,7 @@ Never cut: G1, G3, the Tier 1 eval gate, G8, the handoff row, honest escalation,
 - **You get:** CLAUDE.md, plan.md, `.claude/` agents and commands; G1, G2, G9; streaming chat skeleton.
 - **Done looks like:** each gate proven once (blocked env edit, refused fake-key commit, type error fixed by Stop hook); production URL streams a reply.
 - **Setup notes:** the repo already exists (`mejohnc-ft/agent-evaluation`, docs in place), so commit 1 is the docs; scaffold Next.js into a temp dir and copy it in as commit 2; push to the existing `origin` (no `gh repo create`). Set Node 22 in Vercel project settings (it defaults to 24). Vercel Production gets the personal OpenRouter key, not the Cadre key (D7). Next 16.4 enables `cacheComponents`: render the `useChat` client component inside `<Suspense>` or the build fails.
-- [ ] Status · Actual time: · Notes:
+- [x] Status · Actual time: 2026-10-12 09:25–09:35 · Notes: G1 refused a staged fake key; G2 blocked `.env.local` edits and `cat .env`; G9 Stop hook blocked on an injected TS2322. Production https://agent-evaluation-five.vercel.app streams a Haiku 5.5 reply. Push-to-deploy not yet firing (Vercel GitHub app access); deployed with `vercel deploy --prod`. Node still 24.x on Vercel despite `engines`.
 
 ## Phase 1: Knowledge, prompt, Tier 1 evals (0:45–2:30)
 
