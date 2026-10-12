@@ -1,10 +1,18 @@
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
+import type { LanguageModel } from "ai";
 
-const apiKey = process.env.OPENROUTER_API_KEY;
-const configuredModel = process.env.MODEL_ID;
-if (!apiKey || !configuredModel) throw new Error("OPENROUTER_API_KEY and MODEL_ID must be set");
+// Env is read on first use, not at import, so `next build` (Preview, CI) needs no secrets.
+let loaded: { id: string; model: LanguageModel } | undefined;
 
-const openrouter = createOpenRouter({ apiKey });
+function load() {
+  if (loaded) return loaded;
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  const id = process.env.MODEL_ID;
+  if (!apiKey || !id) throw new Error("OPENROUTER_API_KEY and MODEL_ID must be set");
+  // Usage accounting returns OpenRouter's billed cost per call (providerMetadata.openrouter.usage.cost).
+  loaded = { id, model: createOpenRouter({ apiKey }).chat(id, { usage: { include: true } }) };
+  return loaded;
+}
 
-export const modelId: string = configuredModel;
-export const chatModel = openrouter(modelId);
+export const modelId = () => load().id;
+export const chatModel = () => load().model;

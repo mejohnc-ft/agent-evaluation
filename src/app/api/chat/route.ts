@@ -1,13 +1,24 @@
 import { convertToModelMessages, createUIMessageStream, createUIMessageStreamResponse, type UIMessage } from "ai";
 import { after } from "next/server";
+import { checkBotId } from "botid/server";
+import { checkBot } from "@/lib/guards/bot-check";
 import { checkInput } from "@/lib/guards/input-cap";
 import { checkRateLimit } from "@/lib/guards/rate-limit";
+import { pass } from "@/lib/guards/messages";
 import { checkSpend } from "@/lib/guards/spend-breaker";
 import { modelId } from "@/lib/llm";
 import { buildSystemPrompt } from "@/lib/prompt/build";
 import { generateReply } from "@/lib/reply";
 import { createSupabaseStore } from "@/lib/store/supabase";
+import { createMemoryStore } from "@/lib/store/memory";
+import type { Store } from "@/lib/store/types";
+import { matchesSecret } from "@/lib/secrets";
 import { logTurn } from "@/lib/turn-log";
+
+// Local development without Supabase credentials keeps everything in memory (never in production).
+const devStore =
+  process.env.NODE_ENV === "development" && !process.env.SUPABASE_SERVICE_ROLE_KEY ? createMemoryStore() : undefined;
+if (devStore) console.warn("SUPABASE_SERVICE_ROLE_KEY not set: using the in-memory store for local development");
 
 const FALLBACK = "Sorry, I couldn't answer just now. Please try again, or email the team at hello@gocadre.ai.";
 
@@ -33,14 +44,18 @@ export async function POST(req: Request) {
   const conversationId = typeof body.id === "string" && /^[\w-]{1,100}$/.test(body.id) ? body.id : crypto.randomUUID();
   const clientKey = req.headers.get("x-forwarded-for")?.split(",")[0].trim() || "unknown";
 
-  let store;
+  let store: Store;
   try {
-    store = createSupabaseStore();
+    store = devStore ?? createSupabaseStore();
   } catch (error) {
     console.error("store unavailable", error instanceof Error ? error.message : error);
     return say(FALLBACK);
   }
 
+  // The scheduled smoke test runs headless; its secret token skips only the bot check (D16).
+  const trustedAutomation = matchesSecret(req.headers.get("x-smoke-token"), process.env.SMOKE_TOKEN);
+  const bot = trustedAutomation ? pass : await checkBot(checkBotId, console.error);
+  if (!bot.ok) return say(bot.message);
   const rate = await checkRateLimit(store, `ip:${clientKey}`, console.error);
   if (!rate.ok) return say(rate.message);
   const spend = await checkSpend(store, Number(process.env.DAILY_SPEND_LIMIT_USD ?? 1), console.error);
@@ -50,7 +65,13 @@ export async function POST(req: Request) {
     .filter((m) => m.role === "user")
     .map((m) => m.parts.map((p) => (p.type === "text" ? p.text : "")).join(""));
   const started = Date.now();
-  const result = generateReply(await convertToModelMessages(messages), { store, conversationId, userTexts });
+  let result: ReturnType<typeof generateReply>;
+  try {
+    result = generateReply(await convertToModelMessages(messages), { store, conversationId, userTexts });
+  } catch (error) {
+    console.error("model unavailable", error instanceof Error ? error.message : error);
+    return say(FALLBACK);
+  }
 
   after(async () => {
     try {
@@ -60,9 +81,10 @@ export async function POST(req: Request) {
         userText: userTexts.at(-1) ?? "",
         replyText,
         toolCalls: steps.flatMap((s) => s.toolCalls.map((c) => c.toolName)),
-        model: modelId,
+        model: modelId(),
         promptHash: buildSystemPrompt().hash,
         usage,
+        steps,
         latencyMs: Date.now() - started,
       });
     } catch (error) {

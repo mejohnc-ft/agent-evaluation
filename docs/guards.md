@@ -89,3 +89,17 @@ Matching compares whole addresses found in the visitor's text, not substrings, s
 typed address does not pass. The rejection message is for the model (via the tool result): ask the
 visitor to type their email in the chat. The UI never confirms a handoff unless the row is written.
 No store access.
+
+## bot-check
+
+Vercel BotID classifies each `/api/chat` request invisibly: the browser runs a challenge set up by
+`src/instrumentation-client.ts`, and the route calls `checkBotId()` before the rate limit. No CAPTCHA
+or press-and-hold, so real visitors see nothing.
+
+| Failure mode | Behaviour |
+| --- | --- |
+| Scripted client (curl, headless scraper) without a valid challenge token | blocked, `bot_blocked`, no model call |
+| Real browser | passes |
+| BotID verification throws | fails open and logs; the rate limit and spend breaker still apply |
+
+Visitor sees: "I couldn't verify this browser. Please reload the page and try again, or email hello@gocadre.ai."

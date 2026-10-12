@@ -1,6 +1,7 @@
 import { tool } from "ai";
 import { z } from "zod";
 import type { ToolContext } from "../store/types";
+import type { GapOutput } from "./ui-types";
 
 export function logKnowledgeGap(ctx: ToolContext) {
   return tool({
@@ -10,7 +11,7 @@ export function logKnowledgeGap(ctx: ToolContext) {
       question: z.string().min(3).max(500).describe("The visitor's question, paraphrased without personal details"),
       topic: z.string().max(60).nullable().describe("A short topic label, e.g. offices, pricing, careers"),
     }),
-    execute: async ({ question, topic }) => {
+    execute: async ({ question, topic }): Promise<GapOutput> => {
       await ctx.store.insertGap({ conversationId: ctx.conversationId, question, topic });
       return { logged: true };
     },

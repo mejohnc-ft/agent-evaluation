@@ -1,4 +1,4 @@
-import type { LanguageModelUsage } from "ai";
+import type { LanguageModelUsage, ProviderMetadata } from "ai";
 import type { Store, TurnRow } from "./store/types";
 
 // USD per million tokens (OpenRouter, D7). Unknown models are billed at the highest rate so
@@ -14,18 +14,28 @@ const EMAIL = /[^\s@<>()]+@[^\s@<>()]+\.[a-z]{2,}/gi;
 // Conversation logs keep content without contact details (path-to-production.md).
 const redactContacts = (text: string) => text.replace(EMAIL, "[email]");
 
-type Turn = Omit<TurnRow, "inputTokens" | "outputTokens" | "costUsd"> & { usage: LanguageModelUsage };
-
-export async function logTurn(store: Store, { usage, ...turn }: Turn) {
-  const rate = RATES[turn.model] ?? FALLBACK_RATE;
+// OpenRouter's billed cost when every step reports it; otherwise an estimate from the rate table.
+export function costUsd(model: string, usage: LanguageModelUsage, steps: { providerMetadata?: ProviderMetadata }[]): number {
+  const reported = steps.map((s) => (s.providerMetadata?.openrouter?.usage as { cost?: unknown } | undefined)?.cost);
+  if (reported.length && reported.every((c) => typeof c === "number")) return (reported as number[]).reduce((a, b) => a + b, 0);
+  const rate = RATES[model] ?? FALLBACK_RATE;
   const cached = usage.inputTokenDetails.cacheReadTokens ?? 0;
   const uncached = (usage.inputTokens ?? 0) - cached;
+  return (uncached * rate.input + cached * rate.cached + (usage.outputTokens ?? 0) * rate.output) / 1_000_000;
+}
+
+type Turn = Omit<TurnRow, "inputTokens" | "outputTokens" | "costUsd"> & {
+  usage: LanguageModelUsage;
+  steps: { providerMetadata?: ProviderMetadata }[];
+};
+
+export async function logTurn(store: Store, { usage, steps, ...turn }: Turn) {
   await store.insertTurn({
     ...turn,
     userText: redactContacts(turn.userText),
     replyText: redactContacts(turn.replyText),
     inputTokens: usage.inputTokens ?? 0,
     outputTokens: usage.outputTokens ?? 0,
-    costUsd: (uncached * rate.input + cached * rate.cached + (usage.outputTokens ?? 0) * rate.output) / 1_000_000,
+    costUsd: costUsd(turn.model, usage, steps),
   });
 }

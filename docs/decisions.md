@@ -41,11 +41,29 @@ Template:
 - Evidence: discovery pre-read 2026-10-12, `/strategy` and `/ai-engineering`.
 - Revisit when: Cadre provides a security statement.
 
-## D5: Chat model
-- TODO(you): fill at 5:12 from the comparison table (pass rate per tier, p50 latency, cost per conversation).
+## D5: Chat model is Claude Haiku 5.5
+- Context: the brief's success metrics are correct, sourced answers (groundedness first), honest escalation, and cost under $0.01 per conversation.
+- Decision: keep `anthropic/claude-haiku-5.5`.
+- Evidence: all 33 scenarios (Tier 1 deterministic, Tier 2 judged by Sonnet 5.5, Tier 3 adversarial), prompt 8d4bdf3cdcc1, 2026-10-12; cost is OpenRouter's billed cost per scenario, model only.
 
-## D6: Judge calibration
-- TODO(you): fill at 4:48. Agreement x/10 and what you changed in the rubric because of disagreements.
+  | Model | Tier 1 | Tier 2 | Tier 3 | p50 latency | Cost / scenario |
+  | --- | --- | --- | --- | --- | --- |
+  | anthropic/claude-haiku-5.5 | 21/21 | 6/6 | 6/6 | 3.1 s | $0.00039 |
+  | openai/gpt-6-luna | 20/21 → 21/21* | 5/6 → 6/6 | 6/6 | 2.7 s | $0.00018 |
+  | anthropic/claude-sonnet-5.5 | 20/21 | 4/6 | 6/6 | 4.4 s | $0.00916 |
+
+  \*Luna's first run failed three Tier 1 assertions on curly apostrophes and one on "aren't published" (assertion fixes, commit 251bfb3) and one Tier 2 groundedness check: it said the Showing Scheduler reduces status chasing, which the KB doesn't say. The rerun passed Tier 2.
+- Rejected: Sonnet 5.5 (23x the cost, slower, and its longer answers failed `concise` and once `grounded`, calling the free Maturity Index "low-cost"); GPT-6 Luna (cheaper and slightly faster, but the only model with an invented claim in this run, and groundedness outranks a $0.0002 saving).
+- Revisit when: a run of 3+ repetitions shows Luna with zero groundedness failures, or traffic makes the cost difference material.
+
+## D6: Judge calibration: 10/10 after two rubric changes
+- Context: Tier 2 is scored by a Sonnet 5.5 judge; its scores mean something only if it agrees with a reference.
+- Decision: 10 transcripts in `evals/calibration.yaml`: 6 real Haiku replies from Tier 2 runs and 4 synthetic failures written by Claude (invented price, invented training format, hype tone, login troubleshooting). Labels: the owner delegated labelling; synthetic items are labelled by construction, real items from Claude's claim-by-claim check against `knowledge/`. Owner decision applied: escalation judges only the handoff, and invented facts fail `grounded` (no double counting).
+- Changes from disagreements: (1) `correct_escalation` no longer fails a reply that routes correctly but invents a fact; that is `grounded`'s job. (2) `concise`: about 120 words is a target, not a limit; word count alone fails only past about 200 (the judge had failed a 130-word list).
+- Evidence: first run 9/10 (concise disagreement); after both changes 10/10 (grounded 9/9, answers_question 7/7, correct_escalation 8/8, tone 7/7, concise 7/7). Tier 2 on the calibrated rubric: 16/18 over three runs; both misses are genuine small groundedness slips the judge caught (describing the contents of cadre.ai's contact form; "the Departments page has more detail").
+- Limitation: labels are not an independent human review; real-item labels share the author of the rubric. A second reviewer would strengthen this.
+- Revisit when: the rubric, judge model or chat model changes; re-run `npm run eval:calibrate`.
+
 
 ## D7: The Cadre OpenRouter key enters production only after the guards are live
 - Context: Cadre supplied a $5 OpenRouter key for the public demo. A public URL without a rate limit or spend breaker can drain it, and an empty key on review day means the demo is down.
@@ -95,3 +113,25 @@ Template:
 - Rejected: swapping now (no need while traffic is only testing).
 - Evidence: production QA 2026-10-12 17:24–17:25 UTC: 21 turns cost $0.0045 total.
 - Revisit when: final QA, before submission.
+
+## D14: Contact details come through a typed form (show_contact_form), submitted as the visitor's own message
+- Context: the brief's next-step card (Q2) and the invariant that visitors type their own contact details. Asking for an email in free text works, but invites typos, partial details and model paraphrase.
+- Decision: a fourth tool, `show_contact_form`, renders a typed form card (name, work email, company, need, consent). Submission sends a structured visitor message ("Contact details for follow-up: …"), and the model then calls `request_human_followup`. Contact provenance, evals and the single handoff path are unchanged. Tool output shapes live in `src/lib/tools/ui-types.ts`, shared with the UI.
+- Rejected: a client-side tool result carrying the details (provenance would have to trust tool output, and evals would need a second path); a separate form endpoint that writes `handoffs` directly (two handoff paths to guard and test).
+- Evidence: Tier 1 `contact-form-offered` failed before the tool existed, passes after; `form-submission-handoff` passes with the exact email; 21/21 (prompt 8132cabaf57f).
+- Revisit when: Cadre wants intake fields mapped to a CRM (Q3).
+
+## D16: Bot protection is Vercel BotID, not a CAPTCHA
+- Context: a public chat that spends model tokens attracts scripted traffic; the IP rate limit and spend breaker cap damage but don't tell a bot from a person.
+- Decision: Vercel BotID on `POST /api/chat` (invisible challenge, `checkBotId()` in the route before the rate limit). Bots get the friendly fallback without a model call. Fails open if BotID errors. Attack Mode in the Vercel Firewall stays the manual emergency switch.
+- Rejected: CAPTCHA or press-and-hold (friction on every real visitor of a support chat); a full load test (out of proportion for a demo; a burst on Preview proves the guard paths).
+- Evidence: `src/lib/guards/bot-check.test.ts` red before the guard existed, green after (63 tests).
+- Automation: the headless smoke test (G8 and the 30-minute uptime schedule) sends `x-smoke-token`; a constant-time match with `SMOKE_TOKEN` skips the bot check only, never the rate limit or spend breaker. The 256-bit token was generated straight into Vercel and GitHub and never printed. BotID's docs don't say Vercel's protection-bypass header exempts it, so this doesn't rely on that.
+- Revisit when: Deep Analysis is enabled in the Firewall, or bot traffic shows up in turn logs.
+
+## D15: Retention periods and deletion requests
+- Context: the bot stores turns, gaps, rate counters and handoffs; path-to-production.md promised retention and a deletion route without either existing.
+- Decision: `conversation_turns` 90 days, `knowledge_gaps` 180 days, `rate_counters` 1 day, `handoffs` 12 months. A daily Vercel Cron (`vercel.json`, 04:00 UTC) calls `/api/cron/retention` with `CRON_SECRET` (generated straight into Vercel, never printed). Deletion requests run `npm run delete-contact`. Both live in `src/lib/store/maintenance.ts`, separate from the chat `Store`, so the chat path can never delete.
+- Rejected: Supabase `pg_cron` (needs write access through the MCP, which is read-only by D12, and hides the job outside the repo); keeping everything indefinitely.
+- Evidence: `src/lib/retention.test.ts` (cutoffs and cron auth) red before the module existed, green after (67 tests).
+- Revisit when: Cadre states its own retention policy, or handoffs move to a CRM (then handoffs here can drop to 30 days).
