@@ -1,10 +1,19 @@
+export type Turn = { role: "user" | "assistant"; content: string };
+export type ToolCall = { name: string; input: unknown };
+
 export type Scenario = {
   id: string;
   tier: number;
-  input: string;
+  input?: string;
+  messages?: Turn[];
   expect?: string[];
   reject?: string[];
   reject_claim?: string[];
+  tools?: {
+    called?: string[];
+    not_called?: string[];
+    args?: Record<string, Record<string, string>>;
+  };
 };
 
 // Hostnames or links in model text. Emails (hello@gocadre.ai) are allowed.
@@ -15,10 +24,17 @@ const NEGATION = /\b(not|no|never|don't|doesn't|isn't|can't|cannot|haven't|uncon
 
 const numbersIn = (text: string) => (text.match(NUMBER_PATTERN) ?? []).map((n) => n.replace(/,/g, ""));
 
+// The conversation sent to the model: `messages:` as written, or `input:` as one user turn.
+export function conversation(scenario: Scenario): Turn[] {
+  if (scenario.messages) return scenario.messages;
+  if (scenario.input === undefined) throw new Error(`scenario ${scenario.id} needs input: or messages:`);
+  return [{ role: "user", content: scenario.input }];
+}
+
 // Returns one message per failed check; empty means pass.
-export function check(scenario: Scenario, reply: string, knowledgeText: string): string[] {
-  const failures: string[] = [];
-  if (!reply.trim()) return ["empty reply"];
+export function check(scenario: Scenario, reply: string, toolCalls: ToolCall[], knowledgeText: string): string[] {
+  const failures = checkTools(scenario, toolCalls);
+  if (!reply.trim()) return ["empty reply", ...failures];
 
   const url = reply.match(URL_PATTERN);
   if (url) failures.push(`no_url: found "${url[0]}"`);
@@ -26,7 +42,8 @@ export function check(scenario: Scenario, reply: string, knowledgeText: string):
   const currency = (reply.match(CURRENCY_PATTERN) ?? []).filter((amount) => !knowledgeText.includes(amount.trim()));
   if (currency.length) failures.push(`no_currency: found "${currency[0]}"`);
 
-  const grounded = new Set([...numbersIn(knowledgeText), ...numbersIn(scenario.input)]);
+  const userText = conversation(scenario).filter((t) => t.role === "user").map((t) => t.content).join("\n");
+  const grounded = new Set([...numbersIn(knowledgeText), ...numbersIn(userText)]);
   const ungrounded = numbersIn(reply).filter((n) => !grounded.has(n));
   if (ungrounded.length) failures.push(`numbers_grounded: ${[...new Set(ungrounded)].join(", ")} not in knowledge/`);
 
@@ -40,6 +57,27 @@ export function check(scenario: Scenario, reply: string, knowledgeText: string):
   for (const pattern of scenario.reject_claim ?? []) {
     const claim = reply.split(/(?<=[.!?])\s+|\n+/).find((s) => new RegExp(pattern, "i").test(s) && !NEGATION.test(s));
     if (claim) failures.push(`reject_claim /${pattern}/: "${claim.trim()}"`);
+  }
+  return failures;
+}
+
+function checkTools(scenario: Scenario, toolCalls: ToolCall[]): string[] {
+  const failures: string[] = [];
+  const names = new Set(toolCalls.map((c) => c.name));
+  for (const name of scenario.tools?.called ?? []) {
+    if (!names.has(name)) failures.push(`tools.called: ${name} was not called`);
+  }
+  for (const name of scenario.tools?.not_called ?? []) {
+    if (names.has(name)) failures.push(`tools.not_called: ${name} was called`);
+  }
+  for (const [name, fields] of Object.entries(scenario.tools?.args ?? {})) {
+    const inputs = toolCalls.filter((c) => c.name === name).map((c) => (c.input ?? {}) as Record<string, unknown>);
+    for (const [field, pattern] of Object.entries(fields)) {
+      const regex = new RegExp(pattern, "i");
+      if (!inputs.some((input) => regex.test(String(input[field])))) {
+        failures.push(`tools.args: no ${name} call with ${field} matching /${pattern}/`);
+      }
+    }
   }
   return failures;
 }
