@@ -7,13 +7,13 @@ The model never writes URLs. Links reach the visitor only as cards rendered from
 
 Live: <https://cadre.mejohnc.org> (also <https://agent-evaluation-five.vercel.app>)
 
-Built by John Christensen with Claude Code. Brief: `docs/client-brief.md`. Plan and gates: `plan.md`. Decisions: `docs/decisions.md` (D1 to D18).
+Built by John Christensen with Claude Code. Brief: `docs/client-brief.md`. Plan and gates: `plan.md`. Decisions: `docs/decisions.md` (D1 to D20).
 
 ## What to look at first
 
 - **The Behind the scenes panel in the live UI** (header button). For each reply it shows the guards that ran, the tools called, saved handoffs and gaps, model, tokens, estimated cost and latency, plus a Sources tab listing every knowledge file's source page and verified date (D17).
 - **`evals/scenarios.yaml` and `evals/rubric.md`**: 39 scenarios in three tiers, with global checks applied to every reply. The rubric is calibrated against `evals/calibration.yaml` (D6).
-- **`docs/decisions.md`**: 18 decisions, each with the rejected alternative and the evidence. D5 (model choice), D9 to D11 (conflicting facts on Cadre's own site) and D17 (in-app observability) are the most useful.
+- **`docs/decisions.md`**: 20 decisions, each with the rejected alternative and the evidence. D5 (model choice), D9 to D11 (conflicting facts on Cadre's own site), D17 (in-app observability) and D20 (tools before text) are the most useful.
 - **`src/lib/guards/`**: one file per guard, each with tests written from the failure modes in `docs/guards.md` before the guard existed (G5).
 - **`src/lib/prompt/system.md`**: the bot's rules, 43 lines. `prompt.snapshot.md` next to it is the reviewed copy that G4 checks against.
 - **`knowledge/` with `knowledge/_evidence/`**: 21 topic files plus `links.md` (22 allowlisted links). Frontmatter carries `source:` and `verified:`, and G3 enforces it.
@@ -21,7 +21,7 @@ Built by John Christensen with Claude Code. Brief: `docs/client-brief.md`. Plan 
 ## How it works
 
 `POST /api/chat` (`src/app/api/chat/route.ts`) runs the guards in order: input cap, BotID, rate limit, spend breaker. A guard that trips returns a friendly assistant message, never a blank chat or a 500.
-The route then calls `generateReply` (`src/lib/reply.ts`), the only reply path, shared with the eval runner. It streams from Haiku 5.5 at temperature 0, with five tools and the link filter applied to the text stream.
+The route then calls `generateReply` (`src/lib/reply.ts`), the only reply path, shared with the eval runner. It streams from Haiku 5.5 at temperature 0 with five tools; the first step must be a tool decision (`answer_directly` when none is needed, D20), and the link filter and price guard run on the text stream.
 A step that has already written text ends the turn, so the visitor gets one reply (the `single_reply` fix, commit 7596fdb).
 When the reply finishes, the turn's typed events are attached to the stream as message metadata, and the panel renders them.
 After the response is sent, `after()` writes the turn to `conversation_turns` (emails redacted, OpenRouter's billed cost) and flushes the events to `events`.
@@ -31,7 +31,7 @@ flowchart LR
   V[Visitor] --> R["/api/chat"]
   R --> G{"input cap -> BotID -> rate limit -> spend breaker"}
   G -- block --> F[Friendly message + guard event]
-  G -- pass --> GR["generateReply: Haiku 5.5, temp 0, 5 tools"]
+  G -- pass --> GR["generateReply: Haiku 5.5, temp 0, tools first"]
   GR --> T[Tools: links, form, handoff, gap]
   T --> S[(Supabase)]
   GR --> LF[Link filter on text stream]
@@ -226,7 +226,7 @@ src/app/
 src/lib/
   reply.ts                    generateReply, shared by route and evals
   prompt/                     system.md, build.ts, prompt.snapshot.md
-  tools/                      the five tools and their output types
+  tools/                      the five tools, answer_directly, and their output types
   guards/                     input cap, bot check, rate limit, spend, link filter, provenance
   events/                     typed AppEvent schema and log (D17)
   store/                      Store contract, Supabase and in-memory stores, maintenance

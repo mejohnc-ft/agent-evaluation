@@ -15,7 +15,7 @@ Success is correct, sourced answers and a clean handoff, not broad coverage.
 - `src/app/api/chat/route.ts`: guards, then `generateReply`, then stream with event metadata, then logging. No prompt text here.
 - `src/lib/reply.ts`: `generateReply(messages, ctx)`. Shared by the route and the eval runner; never fork it.
 - `src/lib/prompt/`: `system.md` (bot rules) and `build.ts` (prompt assembly, hash, caching).
-- `src/lib/tools/`: `get_booking_link`, `get_page_link`, `show_contact_form`, `request_human_followup`, `log_knowledge_gap` (zod schemas; outputs typed in `ui-types.ts` and rendered as cards).
+- `src/lib/tools/`: `get_booking_link`, `get_page_link`, `show_contact_form`, `request_human_followup`, `log_knowledge_gap`, plus the no-op `answer_directly` (zod schemas; outputs typed in `ui-types.ts` and rendered as cards). Step 1 of every turn must call a tool (D20).
 - `src/lib/guards/`: input cap, bot check (BotID, D16), rate limit, spend breaker, link filter, price guard, contact provenance.
 - `knowledge/*.md`: one topic per file. Frontmatter: `source:`, `verified:`, `industries:`, `services:`. Evidence in `knowledge/_evidence/`. Allowlist in `knowledge/links.md`.
 - `evals/`: `scenarios.yaml`, `rubric.md`, `calibration.yaml`, `results/`.
