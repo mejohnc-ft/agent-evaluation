@@ -1,5 +1,5 @@
-import { cacheLife } from "next/cache";
 import { ImageResponse } from "next/og";
+import { inter } from "./og-font";
 
 // Share card: the empty state's eyebrow and headline, then the header's footnote under a hairline.
 export const alt = "Cadre AI Assistant: ask about Cadre's services, industries and how to work with the team.";
@@ -10,18 +10,6 @@ const EYEBROW = "CADRE AI ASSISTANT";
 const HEADLINE = "Ask about Cadre's services, industries and how to work with the team.";
 const FOOTNOTE = "AI assistant · answers from cadre.ai";
 
-// Inter subset to the glyphs used, fetched at build like next/font and
-// cached with "use cache" (Cache Components hangs uncached fetches while prerendering). A failed
-// fetch fails the build.
-async function inter(weight: number, text: string): Promise<ArrayBuffer> {
-  "use cache";
-  cacheLife("max");
-  const cssUrl = `https://fonts.googleapis.com/css2?family=Inter:wght@${weight}&text=${encodeURIComponent(text)}`;
-  const css = await (await fetch(cssUrl)).text();
-  const url = css.match(/src: url\((.+?)\) format\('(?:opentype|truetype)'\)/)?.[1];
-  if (!url) throw new Error(`Inter ${weight}: no truetype source in the Google Fonts CSS`);
-  return (await fetch(url)).arrayBuffer();
-}
 
 export default async function OpengraphImage() {
   const [regular, medium, semibold] = await Promise.all([

@@ -1,25 +1,13 @@
-import { cacheLife } from "next/cache";
 import { ImageResponse } from "next/og";
+import { inter } from "./og-font";
 
 // Home-screen icon: the icon.tsx monogram, full-bleed square (iOS applies its own mask).
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
-// Inter Bold subset to one glyph, fetched at build like next/font and
-// cached with "use cache" (Cache Components hangs uncached fetches while prerendering). A failed
-// fetch fails the build.
-async function interBold(text: string): Promise<ArrayBuffer> {
-  "use cache";
-  cacheLife("max");
-  const cssUrl = `https://fonts.googleapis.com/css2?family=Inter:wght@700&text=${encodeURIComponent(text)}`;
-  const css = await (await fetch(cssUrl)).text();
-  const url = css.match(/src: url\((.+?)\) format\('(?:opentype|truetype)'\)/)?.[1];
-  if (!url) throw new Error("Inter Bold: no truetype source in the Google Fonts CSS");
-  return (await fetch(url)).arrayBuffer();
-}
 
 export default async function AppleIcon() {
-  const font = await interBold("C");
+  const font = await inter(700, "C");
   return new ImageResponse(
     (
       <div

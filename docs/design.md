@@ -20,7 +20,7 @@ from cadre.ai's production CSS; dark values are our own.
 | `faint` | `#737373` | `#8f8a89` | placeholders, icons, 4.7:1 |
 | `hairline` | `#0000001a` | `#ffffff1a` | `--wf-hairline` |
 | `hairline-strong` | `#00000033` | `#ffffff33` | inputs, composer |
-| `accent` | `#db4545` | `#ec6a6a` | `--cadre-red`: dots, focus outline, alert icon |
+| `accent` | `#db4545` | `#ec6a6a` | `--cadre-red`: dots, alert icon |
 | `accent-ink` | `#c43a3a` | `#f07a7a` | red text on surface (errors), 5.2:1 |
 | `accent-fill` / `-hover` | `#c43a3a` / `#a93131` | `#c43a3a` / `#d24a4a` | filled buttons |
 | `accent-soft` | `#fbe9e9` | `#2c1617` | `--red-soft`: selection, error ring |
@@ -75,12 +75,13 @@ Inputs use `body` (16 px) on phones so iOS Safari doesn't zoom on focus.
   44 px-tall invisible `::after`. The consent checkbox's whole label row is the target.
 - **Focus.** Text fields and the composer draw their own neutral focus: border to `ink/60` plus a
   3 px `ink/8` ring. Links, buttons and checkboxes use the global `:focus-visible` outline
-  (2 px `accent`, 2 px offset) from `globals.css`.
+  (2 px `ink`, 2 px offset) from `globals.css`. Focus is never red: red means error or conversion,
+  and a red ring disappears around a red button.
 - **Red is for errors and conversion.** Field errors use `accent-ink` text, an `accent-ink` border
   and an `accent-soft` ring. Filled red buttons (`primaryButton` in `card.tsx`) are only for the
   conversion action in a card. The send button is ink, not red.
 - **Brand red vs fill red.** `#db4545` with white text is 4.24:1 and fails WCAG AA, so filled
-  buttons use `#c43a3a` (5.23:1). `#db4545` stays for dots, accents and the focus outline.
+  buttons use `#c43a3a` (5.23:1). `#db4545` stays for dots and accents.
 - **Errors never show raw messages.** `ChatError` is fixed copy with a retry button.
 
 ## Cards
