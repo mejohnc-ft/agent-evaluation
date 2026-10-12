@@ -2,7 +2,7 @@
 // localStorage can throw (privacy modes, blocked storage), so every access is guarded.
 export type Theme = "system" | "light" | "dark";
 
-export const THEME_KEY = "cadre-theme";
+const THEME_KEY = "cadre-theme";
 const CHANGE_EVENT = "cadre-theme-change";
 const NEXT: Record<Theme, Theme> = { system: "light", light: "dark", dark: "system" };
 

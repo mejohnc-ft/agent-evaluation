@@ -34,11 +34,6 @@ export function SidePanel({ open, onClose, messages }: { open: boolean; onClose:
     onClose();
   }
 
-  function select(next: Tab) {
-    setTab(next);
-    if (next === "sources") setSourcesSeen(true);
-  }
-
   return (
     <aside
       id={PANEL_ID}
@@ -56,7 +51,10 @@ export function SidePanel({ open, onClose, messages }: { open: boolean; onClose:
             <Close className="size-4" />
           </IconButton>
         </div>
-        <Tabs tabs={TABS} selected={tab} onSelect={select} idPrefix="bts" label="Behind the scenes" />
+        <Tabs tabs={TABS} selected={tab} onSelect={(next) => {
+            setTab(next);
+            if (next === "sources") setSourcesSeen(true);
+          }} idPrefix="bts" label="Behind the scenes" />
       </div>
       <div className="gutter min-h-0 flex-1 overflow-y-auto overscroll-contain lg:px-5">
         <div role="tabpanel" id="bts-panel-activity" aria-labelledby="bts-tab-activity" hidden={tab !== "activity"} tabIndex={0}>

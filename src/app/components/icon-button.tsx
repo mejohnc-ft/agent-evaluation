@@ -5,13 +5,13 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & { label: string; active?:
 // 44px icon button with a visible tooltip on hover and keyboard focus. The tooltip repeats the
 // accessible name, so it stays hidden from assistive tech. Pressing with a pointer doesn't take
 // focus: whatever had it (usually the composer) keeps it.
-export function IconButton({ label, active = false, children, className = "", ...rest }: Props) {
+export function IconButton({ label, active = false, children, ...rest }: Props) {
   return (
     <button
       type="button"
       aria-label={label}
       onMouseDown={(e) => e.preventDefault()}
-      className={`group relative grid size-11 shrink-0 place-items-center rounded-full text-muted transition-[background-color,color] duration-300 ease-out-expo hover:bg-sunken hover:text-ink disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent ${active ? "bg-sunken text-ink" : ""} ${className}`}
+      className={`group relative grid size-11 shrink-0 place-items-center rounded-full text-muted transition-[background-color,color] duration-300 ease-out-expo hover:bg-sunken hover:text-ink disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent ${active ? "bg-sunken text-ink" : ""}`}
       {...rest}
     >
       {children}

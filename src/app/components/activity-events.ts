@@ -40,7 +40,7 @@ const OUTCOME = { pass: "passed", block: "blocked", skipped: "skipped" } as cons
 
 // "anthropic/claude-haiku-5.5" → "Haiku 5.5"; other ids lose only their provider prefix.
 export function modelName(id: string): string {
-  const name = id.split("/").pop() ?? id;
+  const name = id.slice(id.lastIndexOf("/") + 1);
   const claude = /^claude-([a-z]+)-([\d.]+)$/i.exec(name);
   if (!claude) return name;
   return `${claude[1][0].toUpperCase()}${claude[1].slice(1)} ${claude[2]}`;

@@ -1,8 +1,6 @@
 import type { UIMessage } from "ai";
 import { activityRow, activityTurns } from "./activity-events";
 
-const time = (iso: string) => new Date(iso).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
-
 // Backend events per reply, newest reply first; within a reply, the order they happened.
 export function ActivityFeed({ messages }: { messages: UIMessage[] }) {
   const turns = activityTurns(messages);
@@ -18,7 +16,7 @@ export function ActivityFeed({ messages }: { messages: UIMessage[] }) {
       {turns.map((turn) => (
         <li key={turn.id} className="animate-rise">
           <h3 className="eyebrow mb-2">
-            Reply {turn.number} · <time dateTime={turn.events[0].at}>{time(turn.events[0].at)}</time>
+            Reply {turn.number} · <time dateTime={turn.events[0].at}>{new Date(turn.events[0].at).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</time>
           </h3>
           <ul className="flex flex-col gap-2 border-l border-hairline pl-3">
             {turn.events.map((event, i) => {

@@ -32,19 +32,20 @@ export function Chat() {
     pin();
   }
 
-  function newChat() {
-    setChatId(crypto.randomUUID());
-    window.scrollTo({ top: 0 });
-  }
-
-  function togglePanel() {
-    if (panelOpen) releasePanelFocus();
-    setPanelOpen(!panelOpen);
-  }
-
   return (
     <>
-      <SiteHeader onNewChat={newChat} newChatDisabled={busy} panelOpen={panelOpen} onTogglePanel={togglePanel} />
+      <SiteHeader
+        onNewChat={() => {
+          setChatId(crypto.randomUUID());
+          window.scrollTo({ top: 0 });
+        }}
+        newChatDisabled={busy}
+        panelOpen={panelOpen}
+        onTogglePanel={() => {
+          if (panelOpen) releasePanelFocus();
+          setPanelOpen(!panelOpen);
+        }}
+      />
       <main className={`w-full flex-1 ${SHIFT} ${reserve}`}>
         <div className="gutter">
           <div ref={contentRef} className="mx-auto max-w-[42rem]">
