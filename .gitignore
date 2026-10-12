@@ -1,0 +1,14 @@
+node_modules/
+.next/
+out/
+dist/
+build/
+coverage/
+.vercel/
+.env*
+!.env.example
+evals/results/*
+!evals/results/.gitkeep
+*.log
+.DS_Store
+*.zip
