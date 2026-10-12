@@ -56,8 +56,13 @@ Template:
 - Rejected: Sonnet 5.5 (23x the cost, slower, and its longer answers failed `concise` and once `grounded`, calling the free Maturity Index "low-cost"); GPT-6 Luna (cheaper and slightly faster, but the only model with an invented claim in this run, and groundedness outranks a $0.0002 saving).
 - Revisit when: a run of 3+ repetitions shows Luna with zero groundedness failures, or traffic makes the cost difference material.
 
-## D6: Judge calibration
-- TODO: fill after the owner confirms evals/calibration.yaml labels (agreement x/10 and rubric changes).
+## D6: Judge calibration: 10/10 after two rubric changes
+- Context: Tier 2 is scored by a Sonnet 5.5 judge; its scores mean something only if it agrees with a reference.
+- Decision: 10 transcripts in `evals/calibration.yaml`: 6 real Haiku replies from Tier 2 runs and 4 synthetic failures written by Claude (invented price, invented training format, hype tone, login troubleshooting). Labels: the owner delegated labelling; synthetic items are labelled by construction, real items from Claude's claim-by-claim check against `knowledge/`. Owner decision applied: escalation judges only the handoff, and invented facts fail `grounded` (no double counting).
+- Changes from disagreements: (1) `correct_escalation` no longer fails a reply that routes correctly but invents a fact; that is `grounded`'s job. (2) `concise`: about 120 words is a target, not a limit; word count alone fails only past about 200 (the judge had failed a 130-word list).
+- Evidence: first run 9/10 (concise disagreement); after both changes 10/10 (grounded 9/9, answers_question 7/7, correct_escalation 8/8, tone 7/7, concise 7/7). Tier 2 on the calibrated rubric: 16/18 over three runs; both misses are genuine small groundedness slips the judge caught (describing the contents of cadre.ai's contact form; "the Departments page has more detail").
+- Limitation: labels are not an independent human review; real-item labels share the author of the rubric. A second reviewer would strengthen this.
+- Revisit when: the rubric, judge model or chat model changes; re-run `npm run eval:calibrate`.
 
 
 ## D7: The Cadre OpenRouter key enters production only after the guards are live

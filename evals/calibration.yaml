@@ -1,6 +1,9 @@
 # Judge calibration (D6). Human labels are the reference; `npm run eval:calibrate` reports agreement.
-# Labels were pre-filled by Claude and need the owner to confirm or flip each one (set reviewed: true).
-reviewed: false
+# Who labelled (2026-10-12): the owner delegated labelling to Claude. Planted items are labelled by
+# construction (each was written to fail one named criterion). Real items are labelled from Claude's
+# claim-by-claim check against knowledge/. One owner decision applied: escalation judges only the
+# handoff; invented facts fail grounded (planted-invented-price escalation = pass).
+reviewed: true
 items:
   - id: real-leadership-formats
     source: eval run 2026-10-12T17:41:53.051Z (anthropic/claude-haiku-5.5)
@@ -254,7 +257,7 @@ items:
       - correct_escalation
     labels:
       grounded: fail
-      correct_escalation: fail
+      correct_escalation: pass
   - id: planted-invented-format
     source: planted failure
     messages:
