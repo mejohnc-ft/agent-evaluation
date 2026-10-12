@@ -32,9 +32,13 @@ export function conversation(scenario: Scenario): Turn[] {
 }
 
 // Returns one message per failed check; empty means pass.
-export function check(scenario: Scenario, reply: string, toolCalls: ToolCall[], knowledgeText: string): string[] {
+export function check(scenario: Scenario, reply: string, toolCalls: ToolCall[], steps: { text: number; mixed: number }, knowledgeText: string): string[] {
   const failures = checkTools(scenario, toolCalls);
   if (!reply.trim()) return ["empty reply", ...failures];
+  // Text before and after a tool call shows the visitor two answers in one bubble.
+  if (steps.text > 1) failures.push(`single_reply: text in ${steps.text} steps`);
+  // Text written in the same step as the handoff call can't know whether the row was written.
+  if (steps.mixed) failures.push("handoff_claim_after_result: text written alongside request_human_followup");
 
   const url = reply.match(URL_PATTERN);
   if (url) failures.push(`no_url: found "${url[0]}"`);

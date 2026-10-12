@@ -31,11 +31,14 @@ async function runOne(scenario: Scenario) {
   const started = Date.now();
   const messages = conversation(scenario);
   const context = toolContext(scenario, messages);
-  const result = generateReply(messages);
+  const result = generateReply(messages, context);
   let reply = "";
   for await (const chunk of result.textStream) reply += chunk;
-  const toolCalls = (await result.steps).flatMap((step) => step.toolCalls.map((c) => ({ name: c.toolName, input: c.input })));
-  const failures = check(scenario, reply, toolCalls, knowledgeText);
+  const steps = await result.steps;
+  const toolCalls = steps.flatMap((step) => step.toolCalls.map((c) => ({ name: c.toolName, input: c.input })));
+  const withText = steps.filter((step) => step.text.trim());
+  const stepCounts = { text: withText.length, mixed: withText.filter((step) => step.toolCalls.some((c) => c.toolName === "request_human_followup")).length };
+  const failures = check(scenario, reply, toolCalls, stepCounts, knowledgeText);
   const mark = failures.length ? "FAIL" : "pass";
   console.log(`${mark}  ${scenario.id}${failures.map((f) => `\n      - ${f}`).join("")}`);
   const stored = { handoffs: context.store.handoffs, gaps: context.store.gaps };
