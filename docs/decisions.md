@@ -115,3 +115,10 @@ Template:
 - Rejected: a client-side tool result carrying the details (provenance would have to trust tool output, and evals would need a second path); a separate form endpoint that writes `handoffs` directly (two handoff paths to guard and test).
 - Evidence: Tier 1 `contact-form-offered` failed before the tool existed, passes after; `form-submission-handoff` passes with the exact email; 21/21 (prompt 8132cabaf57f).
 - Revisit when: Cadre wants intake fields mapped to a CRM (Q3).
+
+## D16: Bot protection is Vercel BotID, not a CAPTCHA
+- Context: a public chat that spends model tokens attracts scripted traffic; the IP rate limit and spend breaker cap damage but don't tell a bot from a person.
+- Decision: Vercel BotID on `POST /api/chat` (invisible challenge, `checkBotId()` in the route before the rate limit). Bots get the friendly fallback without a model call. Fails open if BotID errors. Attack Mode in the Vercel Firewall stays the manual emergency switch.
+- Rejected: CAPTCHA or press-and-hold (friction on every real visitor of a support chat); a full load test (out of proportion for a demo; a burst on Preview proves the guard paths).
+- Evidence: `src/lib/guards/bot-check.test.ts` red before the guard existed, green after (63 tests).
+- Revisit when: Deep Analysis is enabled in the Firewall, or bot traffic shows up in turn logs.
