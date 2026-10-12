@@ -70,6 +70,7 @@ export async function POST(req: Request) {
         model: modelId,
         promptHash: buildSystemPrompt().hash,
         usage,
+        steps,
         latencyMs: Date.now() - started,
       });
     } catch (error) {

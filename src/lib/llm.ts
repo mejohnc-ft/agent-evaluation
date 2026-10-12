@@ -7,4 +7,5 @@ if (!apiKey || !configuredModel) throw new Error("OPENROUTER_API_KEY and MODEL_I
 const openrouter = createOpenRouter({ apiKey });
 
 export const modelId: string = configuredModel;
-export const chatModel = openrouter(modelId);
+// Usage accounting returns OpenRouter's billed cost per call (providerMetadata.openrouter.usage.cost).
+export const chatModel = openrouter(modelId, { usage: { include: true } });
