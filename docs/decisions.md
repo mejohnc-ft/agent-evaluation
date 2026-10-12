@@ -135,3 +135,17 @@ Template:
 - Rejected: Supabase `pg_cron` (needs write access through the MCP, which is read-only by D12, and hides the job outside the repo); keeping everything indefinitely.
 - Evidence: `src/lib/retention.test.ts` (cutoffs and cron auth) red before the module existed, green after (67 tests).
 - Revisit when: Cadre states its own retention policy, or handoffs move to a CRM (then handoffs here can drop to 30 days).
+
+## D17: In-app observability instead of Sentry and Resend
+- Context: the demo needs visible tracking of what the backend does (guards, tools, saved handoffs, gaps, cost, errors) and some alerting, without adding third-party accounts to set up, secure and explain.
+- Decision: a typed `AppEvent` union (zod, `src/lib/events/types.ts`) validated on write, contact details redacted, stored in `events` (RLS on, 90-day retention) and streamed with each reply as message metadata to a non-modal Behind the scenes panel. Alerting is the 30-minute uptime smoke (GitHub emails on failure). Resend is removed: handoffs are saved rows shown in the panel; no email is sent.
+- Rejected: Sentry (another account and SDK for a demo with a handful of routes); Resend (an email nobody reviewing the demo can see; the row is the record).
+- Evidence: event schema, redaction and log tests (78 tests); full suite 35/35 with events recorded per scenario.
+- Revisit when: a CRM integration lands (route handoff alerts there) or traffic makes in-app review impractical (add Sentry).
+
+## D18: Page links render as cards from a fifth tool, get_page_link
+- Context: answers about case studies, services or industries should point to the page, but the bot may never write URLs (link filter, no_url).
+- Decision: `get_page_link` takes one of the `links.md` labels (an explicit list, unit-tested against `links.md`) and returns the allowlisted URL plus a one-line description taken from that page's knowledge file. The UI renders it as a page card. Contact and the AI Maturity Index stay with `get_booking_link`, which carries their call to action.
+- Rejected: letting the model write links that the UI turns into cards (the link filter would strip them, and the model would choose the URL).
+- Evidence: Tier 1 `case-studies-card` and `industry-card` 3/3 each; full suite 35/35.
+- Revisit when: Cadre adds pages (update `links.md` and the label list together).

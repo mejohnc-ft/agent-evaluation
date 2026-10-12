@@ -39,9 +39,13 @@ The widget is a small script tag loading the chat in an iframe from this app, so
 
 ## Monitoring and operations
 
+The demo keeps observability in-app (D17): every turn writes typed events to `events`, and the chat's Behind the scenes panel shows the visitor's own events live. A production rollout would point alerts at these tables, or add Sentry once a CRM integration brings third-party services anyway.
+
 | Signal | Source | Alert when |
 | --- | --- | --- |
-| Error rate | Vercel logs | Over 2% of requests in an hour |
+| Uptime | Scheduled smoke test every 30 minutes (GitHub Actions) | Any failed run (GitHub emails the owner) |
+| Errors | `events` rows of type `error` (route, model, stream, store, handoff), plus Vercel logs | Any `error` event; over 2% of requests in an hour |
+| Guard trips | `events` rows of type `guard_checked` with outcome `block` | Bot or rate-limit blocks spike |
 | Daily spend | Logged cost, spend breaker | 80% of daily budget |
 | Gap rate | `knowledge_gaps` | Rising week over week |
 | Handoff volume | `handoffs` | Drops to zero for a business day (likely broken) |

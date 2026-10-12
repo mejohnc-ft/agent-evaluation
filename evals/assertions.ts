@@ -43,7 +43,7 @@ export function check(scenario: Scenario, rawReply: string, toolCalls: ToolCall[
   // Text before and after a tool call shows the visitor two answers in one bubble.
   if (steps.text > 1) failures.push(`single_reply: text in ${steps.text} steps`);
   // A reply that points to a card must have asked for one; otherwise the visitor looks for a button that isn't there.
-  const cardTools = ["get_booking_link", "show_contact_form"];
+  const cardTools = ["get_booking_link", "show_contact_form", "get_page_link"];
   if (/\b(the|this) (contact )?(button|form) (below|opens)\b|\bbelow is the (button|form)\b|\buse the button\b/i.test(reply) && !toolCalls.some((c) => cardTools.includes(c.name))) {
     failures.push("phantom_card: mentions a button or form but no card tool was called");
   }

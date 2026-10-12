@@ -23,5 +23,6 @@ export function generateReply(messages: ModelMessage[], ctx: ToolContext) {
     // A step that already wrote text ends the turn (single_reply in evals/assertions.ts).
     stopWhen: [isStepCount(3), ({ steps }) => steps.at(-1)!.text.trim() !== ""],
     experimental_transform: stripLinksTransform(),
+    onStepEnd: (step) => step.toolCalls.forEach((call) => ctx.emit({ type: "tool_called", tool: call.toolName })),
   });
 }

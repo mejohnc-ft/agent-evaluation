@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import type { AppEvent } from "../events/types";
 import type { GapRow, HandoffRow, Store, TurnRow } from "./types";
 
 // Supabase is a trust boundary: any error becomes a StoreError, never a partial success.
@@ -62,6 +63,12 @@ export function createSupabaseStore(): Store {
         latency_ms: row.latencyMs,
       });
       if (error) fail("insertTurn", error);
+    },
+
+    async insertEvent(event: AppEvent) {
+      const { type, conversationId, at, ...payload } = event;
+      const { error } = await db.from("events").insert({ type, conversation_id: conversationId, created_at: at, payload });
+      if (error) fail("insertEvent", error);
     },
 
     async bumpRate(key: string, windowSeconds: number) {

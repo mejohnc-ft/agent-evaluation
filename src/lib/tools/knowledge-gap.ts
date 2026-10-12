@@ -13,6 +13,7 @@ export function logKnowledgeGap(ctx: ToolContext) {
     }),
     execute: async ({ question, topic }): Promise<GapOutput> => {
       await ctx.store.insertGap({ conversationId: ctx.conversationId, question, topic });
+      ctx.emit({ type: "gap_logged", topic });
       return { logged: true };
     },
   });
