@@ -1,8 +1,10 @@
 import { isStepCount, streamText, type ModelMessage } from "ai";
 import { stripLinksTransform } from "./guards/link-filter";
+import { needsGapFallback } from "./gap-fallback";
 import { publishedAmounts, redactPricesTransform } from "./guards/price-guard";
 import { chatModel } from "./llm";
 import { buildSystemPrompt, readKnowledge } from "./prompt/build";
+import { redactContacts } from "./redact";
 import type { ToolContext } from "./store/types";
 import { createTools } from "./tools";
 
@@ -26,11 +28,28 @@ export function generateReply(messages: ModelMessage[], ctx: ToolContext) {
     tools: createTools(ctx),
     // Continue only after a tool-only step, so the visitor gets one reply that uses the result.
     // A step that already wrote text ends the turn (single_reply in evals/assertions.ts).
-    stopWhen: [isStepCount(3), ({ steps }) => steps.at(-1)!.text.trim() !== ""],
+    // Step 1 must call tools (answer_directly when none is needed), so text never comes before the
+    // tools it describes. A step that has written text ends the turn: one reply per turn.
+    prepareStep: ({ stepNumber }) => (stepNumber === 0 ? { toolChoice: "required" as const } : {}),
+    stopWhen: [isStepCount(4), ({ steps }) => steps.at(-1)!.text.trim() !== ""],
     experimental_transform: [
       stripLinksTransform(),
       redactPricesTransform(published(), () => ctx.emit({ type: "guard_checked", guard: "price", outcome: "block" })),
     ],
-    onStepEnd: (step) => step.toolCalls.forEach((call) => ctx.emit({ type: "tool_called", tool: call.toolName })),
+    // Guarantees the gap is logged even when the model forgot the tool (awaited before the stream ends).
+    onEnd: async ({ text, steps }) => {
+      if (!needsGapFallback(text, steps.flatMap((s) => s.toolCalls.map((c) => c.toolName)))) return;
+      try {
+        const question = redactContacts(ctx.userTexts.at(-1) ?? "").slice(0, 500) || "(empty question)";
+        await ctx.store.insertGap({ conversationId: ctx.conversationId, question, topic: null });
+        ctx.emit({ type: "gap_logged", topic: null });
+      } catch (error) {
+        ctx.emit({ type: "error", where: "gap_fallback", message: error instanceof Error ? error.message : String(error) });
+      }
+    },
+    onStepEnd: (step) =>
+      step.toolCalls
+        .filter((call) => call.toolName !== "answer_directly")
+        .forEach((call) => ctx.emit({ type: "tool_called", tool: call.toolName })),
   });
 }

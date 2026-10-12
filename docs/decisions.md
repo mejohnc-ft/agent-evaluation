@@ -156,3 +156,10 @@ Template:
 - Rejected: counting homepage logos as claims (D11's reasoning still holds for unlabelled images); leaving partners out (the brief lists partners among the facts the bot should know).
 - Evidence: Tier 1 `partners` failed before the file existed (no partner beyond Anthropic named), passes after.
 - Revisit when: cadre.ai publishes a partners page (switch the source to it).
+
+## D20: Every turn starts with a required tool decision
+- Context: four failures shared one cause: the model sometimes wrote its reply first and meant to call a tool after, and the one-reply stop rule then ended the turn. Results: "the button below" with no button (phantom_card), "the industry page is linked below" with no link, and "I've logged the question" with nothing logged. Prompt wording moved the failure between questions instead of removing it; CI went red on it twice.
+- Decision: step 1 of every turn runs with `toolChoice: "required"`; a no-op `answer_directly` tool covers "nothing needed". Text can only follow tool results. Also: if a reply says it lacks the information and no gap was logged, `generateReply` logs it in `onEnd` (awaited before the stream closes), and the bot never tells visitors about internal logging.
+- Rejected: more prompt rules (tried; the failure moved); retrying failed CI evals (hides real defects); dropping the one-reply stop rule (brings back duplicated replies).
+- Evidence: Tier 1 26/26 on five consecutive runs (130/130) on prompt 3442c6f78538; p50 latency about 3.5 s, in line with before. New checks claim_without_record and gap_logged.
+- Revisit when: a model offers a native "tools before text" mode.

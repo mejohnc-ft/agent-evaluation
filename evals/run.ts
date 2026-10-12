@@ -41,7 +41,7 @@ async function runOne(scenario: Scenario) {
   const steps = await result.steps;
   const toolCalls = steps.flatMap((step) => step.toolCalls.map((c) => ({ name: c.toolName, input: c.input })));
   const withText = steps.filter((step) => step.text.trim());
-  const stepCounts = { text: withText.length, mixed: withText.filter((step) => step.toolCalls.some((c) => c.toolName === "request_human_followup")).length };
+  const stepCounts = { gaps: store.gaps.length, text: withText.length, mixed: withText.filter((step) => step.toolCalls.some((c) => c.toolName === "request_human_followup")).length };
   const failures = check(scenario, reply, toolCalls, stepCounts, knowledgeText);
   const ms = Date.now() - started;
   const cost = costUsd(modelId(), await result.usage, steps);

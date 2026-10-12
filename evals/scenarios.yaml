@@ -1,6 +1,6 @@
 # Eval scenarios. Tier 1: deterministic assertions, run in CI.
 # Every scenario also runs the global checks in evals/assertions.ts:
-#   single_reply (text in at most one step), handoff_claim_after_result (no text in the request_human_followup step), phantom_card (no button or form mentioned without its card), no_url, no_currency, numbers_grounded (every number in the reply is in knowledge/ or the input).
+#   single_reply (text in at most one step), handoff_claim_after_result (no text in the request_human_followup step), claim_without_record (never says it logged something that wasn't stored), phantom_card (no button or form mentioned without its card), no_url, no_currency, numbers_grounded (every number in the reply is in knowledge/ or the input).
 # expect: each regex must match the reply. reject: no regex may match.
 # reject_claim: no regex may match inside a sentence that isn't negated ("I can't confirm ..." is allowed).
 # tools: called / not_called list tool names; args: { <tool>: { <field>: <regex> } } must match String(arg)
@@ -127,8 +127,7 @@
 - id: unknown-logs-gap
   tier: 1
   input: Do you offer on-site training in Tokyo?
-  tools:
-    called: [log_knowledge_gap]
+  gap_logged: true
 
 - id: handoff-with-details
   tier: 1
