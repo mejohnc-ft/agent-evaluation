@@ -106,14 +106,18 @@ Never cut: G1, G3, the Tier 1 eval gate, G8, the handoff row, honest escalation,
 | 2:15 | Runtime price guard parked | Prices are prevented by prompt rules and CI-blocking evals; runtime enforcement deferred |
 | 2:15 | Calibration labels delegated to Claude (D6) | Owner's call; synthetic items labelled by construction |
 | 2:50 | Public `/evals` page replaced by the in-app Behind the scenes panel plus the README eval tables | The panel shows verification live in the product (D17); the cut order allowed a README table instead of `/evals` |
+| 3:40 | Runtime price guard built after all; README known issues trimmed to real trade-offs | Invented pricing is the brief's biggest brand risk; self-imposed and outdated caveats were noise |
+| 3:40 | Cadre's brief used as a source for partners (D19) | The brief lists partners the site shows only as logos |
 
 ## Parking lot
 
-| Idea | Why parked | Revisit when |
+Designed for, not built: the phases left a seam for each, and the current scope and constraints don't justify them.
+
+| Idea | Seam in place | Revisit when |
 | --- | --- | --- |
-| Vector retrieval | Knowledge base fits in context | Prompt passes ~40k tokens |
-| MCP server | Tools already defined once; small next step | After Level 3 page ships |
-| Realtime voice | No grading weight; high demo risk | MCP server exists |
-| CRM write-back | Needs Cadre's field map (Q3) | Production rollout |
+| Vector retrieval | `src/lib/prompt/build.ts` is the only knowledge entry point | Prompt passes ~40k tokens (now ~7.5k) |
+| MCP server | Tools defined once with zod and a `ToolContext` | An internal agent needs the tools |
+| Realtime voice | `generateReply` and tools are transport-agnostic | MCP server exists and voice demand shows up |
+| CRM write-back | `Store.insertHandoff` is the single write path | Cadre names the CRM and field map (Q3) |
 | Auth and chat history | Not needed for anonymous inbound | Client portal integration |
 | Multi-language | No evidence of non-English inbound | Gap report shows demand |

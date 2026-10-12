@@ -5,14 +5,14 @@ It answers only from a knowledge base built from cadre.ai pages, where every fil
 Pricing, account issues, security specifics and anything the knowledge base doesn't cover go to a human, along with the context of the conversation.
 The model never writes URLs. Links reach the visitor only as cards rendered from tool results, and only for allowlisted hosts.
 
-Live: <https://agent-evaluation-five.vercel.app>
+Live: <https://cadre.mejohnc.org> (also <https://agent-evaluation-five.vercel.app>)
 
 Built by John Christensen with Claude Code. Brief: `docs/client-brief.md`. Plan and gates: `plan.md`. Decisions: `docs/decisions.md` (D1 to D18).
 
 ## What to look at first
 
 - **The Behind the scenes panel in the live UI** (header button). For each reply it shows the guards that ran, the tools called, saved handoffs and gaps, model, tokens, estimated cost and latency, plus a Sources tab listing every knowledge file's source page and verified date (D17).
-- **`evals/scenarios.yaml` and `evals/rubric.md`**: 35 scenarios in three tiers, with global checks applied to every reply. The rubric is calibrated against `evals/calibration.yaml` (D6).
+- **`evals/scenarios.yaml` and `evals/rubric.md`**: 39 scenarios in three tiers, with global checks applied to every reply. The rubric is calibrated against `evals/calibration.yaml` (D6).
 - **`docs/decisions.md`**: 18 decisions, each with the rejected alternative and the evidence. D5 (model choice), D9 to D11 (conflicting facts on Cadre's own site) and D17 (in-app observability) are the most useful.
 - **`src/lib/guards/`**: one file per guard, each with tests written from the failure modes in `docs/guards.md` before the guard existed (G5).
 - **`src/lib/prompt/system.md`**: the bot's rules, 43 lines. `prompt.snapshot.md` next to it is the reviewed copy that G4 checks against.
@@ -76,9 +76,9 @@ Each gate is a mechanical check that was made to fail once to prove it works (`p
 
 | Tier | Scenarios | How it's scored | What it covers |
 | --- | --- | --- | --- |
-| 1 | 23 | Regex `expect`/`reject`, tool calls and tool arguments | The brief's scenarios, the knowledge traps (D9 to D11), handoffs, contact form, page cards |
+| 1 | 26 | Regex `expect`/`reject`, tool calls and tool arguments | The brief's scenarios and common inquiries, the knowledge traps (D9 to D11), partners (D19), handoffs, contact form, page cards |
 | 2 | 6 | Sonnet 5.5 judge on `evals/rubric.md`: grounded, answers_question, correct_escalation, tone, concise | Answers regexes can't check: formats, industry fit, vague prospects, pricing pushback |
-| 3 | 6 | Deterministic | Adversarial: prompt leak, "pretend you're human", pasted instructions, a sensitive number, URL bait, off-topic |
+| 3 | 7 | Deterministic | Adversarial: prompt leak, "pretend you're human", pasted instructions, a sensitive number, URL bait, price coaxing, off-topic |
 
 Every scenario also runs six global checks (`evals/assertions.ts`): `single_reply`, `handoff_claim_after_result`, `phantom_card`, `no_url`, `no_currency` and `numbers_grounded`.
 
@@ -117,6 +117,7 @@ Luna was cheaper but was the only model to invent a claim in this run. Groundedn
 | Rate limit | 20 requests per 10 minutes per IP. Fails open on a store error | `src/lib/guards/rate-limit.ts` |
 | Spend breaker | Refuses new turns once today's spend reaches `DAILY_SPEND_LIMIT_USD`. Fails closed | `src/lib/guards/spend-breaker.ts` |
 | Link filter | Strips URLs, bare domains and markdown links from the streamed text, including URLs split across deltas | `src/lib/guards/link-filter.ts` |
+| Price guard | Replaces any currency amount the knowledge base doesn't publish with "[pricing isn't published]", including amounts split across deltas; the panel shows when it fires | `src/lib/guards/price-guard.ts` |
 | Contact provenance | A handoff email must be one the visitor typed verbatim; corrected or invented addresses are rejected | `src/lib/guards/contact-provenance.ts` |
 
 - **Redaction.** Emails are replaced with `[email]` in turn logs and event text (`src/lib/redact.ts`). Contact details live only in `handoffs`.
@@ -166,7 +167,7 @@ Times from the status lines in `plan.md` and the commit log, on 2026-10-12.
 | 2 Tools, handoff, guards, CI | 10:01 to 10:30 | Three parallel worktree tracks (data layer, guards, CI and evals) on a shared `Store` contract; 54 guard tests red then green; handoff row from production |
 | 3 Eval depth, model choice | 10:37 to 11:43 | Rubric, calibrated judge, Tiers 2 and 3, model comparison (D5); G7; contact form (D14), BotID (D16), retention (D15), design pass |
 | Tier 2 consistency | 11:45 to 12:07 | Temperature 0, `phantom_card`, stricter page and card rules (PRs #6, #7) |
-| 4 Visible verification | 12:11 to 12:23 | Behind the scenes panel, typed event log (D17), page cards (D18). Replaced the planned `/evals` page; not yet closed in `plan.md` |
+| 4 Visible verification | 12:11 to 12:23 | Behind the scenes panel, typed event log (D17), page cards (D18). Replaced the planned `/evals` page (`plan.md`, Scope changes) |
 
 How Claude Code was used:
 
@@ -178,26 +179,29 @@ How Claude Code was used:
 - **Plan mode** at the start of each phase, with the failing eval scenarios written before the code.
 - **One branch per phase**, merged by PR once CI is green. Commits carry `Verified:`, `Gate:`, `Caught-by:` and `Eval-change:` trailers.
 
-## Known issues
+## Trade-offs and limits
 
-- **No runtime price guard.** Prices are prevented by prompt rules and CI-blocking evals (`no_currency`, `numbers_grounded`). A model that invents a price in production would not be stopped at runtime (`plan.md`, Scope changes).
-- **Handoff alerting is in-app only (D17).** Resend was removed. A handoff is a saved row shown in the panel, and no one is notified. Uptime alerting is the 30-minute smoke test, which sends GitHub's failure email.
-- **Calibration labels aren't independently human-reviewed (D6).** The judge's 10/10 is agreement with labels that share the rubric's author.
-- **Tier 2 sits near the 90% target.** The Phase 3 close was 16/18 (89%). After temperature 0 and the stricter page rules it ran 30/30 over five runs (f5388d5), but that is a small sample.
-- **Tier 1 regexes need maintenance.** Valid phrasings have failed them three times, each fixed with an `Eval-change:` trailer (251bfb3, 07eb638, a8cf2aa).
-- **Rate limiting is per IP.** Shared offices share a budget, and rotating IPs get around it. BotID and the spend breaker cap the damage.
-- **Production still uses the personal OpenRouter key (D13).** The swap to Cadre's key is deferred to final QA.
-- **Panel cost is an estimate.** The panel's cost comes from a rate table. `conversation_turns` keeps OpenRouter's billed cost.
+- **Handoffs aren't pushed to anyone (D17).** A handoff is a saved `handoffs` row, shown in the panel; no email or CRM alert is sent. In production it would go to Cadre's CRM with an owner alert (Q3).
+- **The knowledge base is a snapshot.** It was built from cadre.ai on 12 Oct 2026; every file carries `verified:`, but nothing re-checks it when the site changes. Refreshing a page is `/add-kb <url>` plus the eval suite; a scheduled re-verify is the next step.
+- **Rate limiting is per IP.** 20 requests per 10 minutes. People behind one office IP share that budget, and rotating IPs get around it; BotID and the daily spend breaker cap the damage.
+
+## Designed to scale to, not built
+
+The phases left seams for these; the current scope and traffic don't justify them yet.
+
+| Capability | Seam already in place | Why not now |
+| --- | --- | --- |
+| Vector retrieval | `src/lib/prompt/build.ts` is the only place knowledge enters the prompt | The whole knowledge base is about 7.5k tokens, fits in context and is cached; revisit near 40k |
+| MCP server | Tools are defined once with zod schemas and a `ToolContext` (`src/lib/tools/`), so they can be exposed over MCP unchanged | No internal agent consumes them yet |
+| Realtime voice | `generateReply` and the tools are transport-agnostic; voice is a new front end over them | No demand signal, high demo risk, and it would build on the MCP layer |
+| CRM handoff | `Store.insertHandoff` is the single write path (`src/lib/store/`) | Needs Cadre's CRM and field map (Q3) |
 
 ## What I'd do next
 
-From the `plan.md` parking lot and `docs/path-to-production.md`:
-
-1. **CRM handoff.** Write handoffs to Cadre's CRM (Salesforce assumed, Q3) and route alerts there. Needs Cadre's field map.
-2. **Shadow rollout.** The inbound team reviews 50 transcripts before the bot goes on cadre.ai/contact, then site-wide as an iframe widget.
-3. **MCP server** so internal agents and a later voice channel reuse the same tools.
-4. **Vector retrieval** once the prompt nears about 40k tokens. Until then the whole knowledge base fits in context and is cached.
-5. **A second human reviewer** for the calibration set, and repeated model runs before revisiting D5.
+1. **CRM handoff with an owner alert**, once Cadre confirms the CRM and fields.
+2. **Shadow rollout.** The inbound team reviews 50 transcripts before the bot goes on cadre.ai/contact, then site-wide as an iframe widget (`docs/path-to-production.md`).
+3. **Scheduled knowledge re-verify**: re-fetch each `source:` page weekly and open a PR when content changes, with the eval suite as the gate.
+4. **A second human reviewer** for the calibration set (D6).
 
 ## Repository map
 
