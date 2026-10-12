@@ -3,6 +3,7 @@ import { z } from "zod";
 import { checkContactProvenance } from "../guards/contact-provenance";
 import { notifyHandoff } from "../notify";
 import type { ToolContext } from "../store/types";
+import type { HandoffOutput } from "./ui-types";
 
 export function requestHumanFollowup(ctx: ToolContext) {
   return tool({
@@ -15,7 +16,7 @@ export function requestHumanFollowup(ctx: ToolContext) {
       intent: z.enum(["sales", "client_support", "security", "other"]),
       summary: z.string().min(10).max(1000).describe("What the visitor needs, in two or three sentences, for the Cadre team"),
     }),
-    execute: async (input) => {
+    execute: async (input): Promise<HandoffOutput> => {
       const provenance = checkContactProvenance(input.email, ctx.userTexts);
       if (!provenance.ok) return { ok: false, error: provenance.message };
       try {

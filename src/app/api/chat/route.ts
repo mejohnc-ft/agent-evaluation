@@ -7,7 +7,14 @@ import { modelId } from "@/lib/llm";
 import { buildSystemPrompt } from "@/lib/prompt/build";
 import { generateReply } from "@/lib/reply";
 import { createSupabaseStore } from "@/lib/store/supabase";
+import { createMemoryStore } from "@/lib/store/memory";
+import type { Store } from "@/lib/store/types";
 import { logTurn } from "@/lib/turn-log";
+
+// Local development without Supabase credentials keeps everything in memory (never in production).
+const devStore =
+  process.env.NODE_ENV === "development" && !process.env.SUPABASE_SERVICE_ROLE_KEY ? createMemoryStore() : undefined;
+if (devStore) console.warn("SUPABASE_SERVICE_ROLE_KEY not set: using the in-memory store for local development");
 
 const FALLBACK = "Sorry, I couldn't answer just now. Please try again, or email the team at hello@gocadre.ai.";
 
@@ -33,9 +40,9 @@ export async function POST(req: Request) {
   const conversationId = typeof body.id === "string" && /^[\w-]{1,100}$/.test(body.id) ? body.id : crypto.randomUUID();
   const clientKey = req.headers.get("x-forwarded-for")?.split(",")[0].trim() || "unknown";
 
-  let store;
+  let store: Store;
   try {
-    store = createSupabaseStore();
+    store = devStore ?? createSupabaseStore();
   } catch (error) {
     console.error("store unavailable", error instanceof Error ? error.message : error);
     return say(FALLBACK);

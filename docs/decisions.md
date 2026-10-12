@@ -95,3 +95,10 @@ Template:
 - Rejected: swapping now (no need while traffic is only testing).
 - Evidence: production QA 2026-10-12 17:24–17:25 UTC: 21 turns cost $0.0045 total.
 - Revisit when: final QA, before submission.
+
+## D14: Contact details come through a typed form (show_contact_form), submitted as the visitor's own message
+- Context: the brief's next-step card (Q2) and the invariant that visitors type their own contact details. Asking for an email in free text works, but invites typos, partial details and model paraphrase.
+- Decision: a fourth tool, `show_contact_form`, renders a typed form card (name, work email, company, need, consent). Submission sends a structured visitor message ("Contact details for follow-up: …"), and the model then calls `request_human_followup`. Contact provenance, evals and the single handoff path are unchanged. Tool output shapes live in `src/lib/tools/ui-types.ts`, shared with the UI.
+- Rejected: a client-side tool result carrying the details (provenance would have to trust tool output, and evals would need a second path); a separate form endpoint that writes `handoffs` directly (two handoff paths to guard and test).
+- Evidence: Tier 1 `contact-form-offered` failed before the tool existed, passes after; `form-submission-handoff` passes with the exact email; 21/21 (prompt 8132cabaf57f).
+- Revisit when: Cadre wants intake fields mapped to a CRM (Q3).
