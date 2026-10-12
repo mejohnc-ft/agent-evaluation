@@ -1,3 +1,5 @@
+import type { Criterion } from "./judge";
+
 export type Turn = { role: "user" | "assistant"; content: string };
 export type ToolCall = { name: string; input: unknown };
 
@@ -9,6 +11,7 @@ export type Scenario = {
   expect?: string[];
   reject?: string[];
   reject_claim?: string[];
+  judge?: Criterion[];
   tools?: {
     called?: string[];
     not_called?: string[];

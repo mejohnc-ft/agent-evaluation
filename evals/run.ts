@@ -6,7 +6,9 @@ import { buildSystemPrompt, readKnowledge } from "../src/lib/prompt/build";
 import { generateReply } from "../src/lib/reply";
 import { createMemoryStore } from "../src/lib/store/memory";
 import type { ToolContext } from "../src/lib/store/types";
+import { costUsd } from "../src/lib/turn-log";
 import { check, conversation, type Scenario } from "./assertions";
+import { judge, type Verdict } from "./judge";
 
 const { values: args } = parseArgs({
   options: { tier: { type: "string" }, id: { type: "string" }, ci: { type: "boolean", default: false } },
@@ -37,10 +39,17 @@ async function runOne(scenario: Scenario) {
   const withText = steps.filter((step) => step.text.trim());
   const stepCounts = { text: withText.length, mixed: withText.filter((step) => step.toolCalls.some((c) => c.toolName === "request_human_followup")).length };
   const failures = check(scenario, reply, toolCalls, stepCounts, knowledgeText);
+  const ms = Date.now() - started;
+  const cost = costUsd(modelId, await result.usage, steps);
+  let verdicts: Verdict[] = [];
+  if (scenario.judge?.length) {
+    verdicts = await judge({ messages, reply, toolCalls }, scenario.judge, knowledgeText);
+    failures.push(...verdicts.filter((v) => !v.pass).map((v) => `judge.${v.criterion}: ${v.reason}`));
+  }
   const mark = failures.length ? "FAIL" : "pass";
   console.log(`${mark}  ${scenario.id}${failures.map((f) => `\n      - ${f}`).join("")}`);
   const stored = { handoffs: context.store.handoffs, gaps: context.store.gaps };
-  return { id: scenario.id, tier: scenario.tier, messages, reply, toolCalls, stored, passed: !failures.length, failures, ms: Date.now() - started };
+  return { id: scenario.id, tier: scenario.tier, messages, reply, toolCalls, stored, verdicts, passed: !failures.length, failures, ms, costUsd: cost };
 }
 
 async function main() {
@@ -50,11 +59,26 @@ async function main() {
   }
 
   const passed = results.filter((r) => r.passed).length;
+  const byTier = Object.fromEntries(
+    [...new Set(results.map((r) => r.tier))].sort().map((tier) => {
+      const inTier = results.filter((r) => r.tier === tier);
+      return [`tier${tier}`, `${inTier.filter((r) => r.passed).length}/${inTier.length}`];
+    }),
+  );
+  const sortedMs = results.map((r) => r.ms).sort((a, b) => a - b);
+  const totalCost = results.reduce((sum, r) => sum + r.costUsd, 0);
   const report = {
     runAt: new Date().toISOString(),
     modelId,
     promptHash: buildSystemPrompt().hash,
-    summary: { passed, failed: results.length - passed, total: results.length },
+    summary: {
+      passed,
+      failed: results.length - passed,
+      total: results.length,
+      byTier,
+      p50Ms: sortedMs[Math.floor(sortedMs.length / 2)],
+      costPerScenarioUsd: totalCost / results.length,
+    },
     results,
   };
   mkdirSync("evals/results", { recursive: true });
@@ -62,7 +86,9 @@ async function main() {
   writeFileSync(`evals/results/${report.runAt.replace(/[:.]/g, "-")}.json`, json);
   writeFileSync("evals/results/latest.json", json);
 
-  console.log(`\n${passed}/${results.length} passed · model ${modelId} · prompt ${report.promptHash}`);
+  const { p50Ms, costPerScenarioUsd } = report.summary;
+  console.log(`\n${passed}/${results.length} passed (${Object.entries(byTier).map(([t, v]) => `${t} ${v}`).join(", ")}) · model ${modelId} · prompt ${report.promptHash}`);
+  console.log(`p50 ${p50Ms} ms · $${costPerScenarioUsd.toFixed(5)} per scenario (model only)`);
   if (args.ci && passed < results.length) process.exit(1);
 }
 

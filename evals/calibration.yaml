@@ -1,0 +1,302 @@
+# Judge calibration (D6). Human labels are the reference; `npm run eval:calibrate` reports agreement.
+# Labels were pre-filled by Claude and need the owner to confirm or flip each one (set reviewed: true).
+reviewed: false
+items:
+  - id: real-leadership-formats
+    source: eval run 2026-10-12T17:41:53.051Z (anthropic/claude-haiku-5.5)
+    messages:
+      - role: user
+        content: What formats does your AI leadership training come in, and what do leaders walk away with?
+    reply: >-
+      Cadre's AI Leadership & Facilitation comes in four formats:
+
+
+      - 1-Hour Virtual Kickoff
+
+      - Half-Day Executive Session
+
+      - 1-Day Workshop
+
+      - 2-Day Leadership Intensive
+
+
+      Each session is split 30% teaching, 30% interaction and 40% application. Every example and exercise
+      comes from your own operations, and the team identifies 3 to 5 specific problems where AI could have
+      impact.
+
+
+      Leaders leave with:
+
+
+      - A prioritized shortlist of AI opportunities
+
+      - Clarity on quick wins versus long-term plays
+
+      - A next-step plan
+
+
+      If you'd like to discuss which format fits your team, I can connect you with an AI Strategist.
+    toolCalls: []
+    criteria:
+      - grounded
+      - answers_question
+      - correct_escalation
+      - tone
+      - concise
+    labels:
+      grounded: pass
+      answers_question: pass
+      correct_escalation: pass
+      tone: pass
+      concise: pass
+  - id: real-real-estate-fit
+    source: eval run 2026-10-12T17:41:53.051Z (anthropic/claude-haiku-5.5)
+    messages:
+      - role: user
+        content: We run a mid-sized commercial real estate brokerage.
+      - role: assistant
+        content: Thanks. Cadre works with real estate firms. What would you like to know?
+      - role: user
+        content: Where would AI actually help a team like ours?
+    reply: >-
+      Cadre's Real Estate page points to four areas where AI can help:
+
+
+      - **Slow property analysis:** manual comps, market research and financial analysis limit how many deals
+      your team can pursue.
+
+      - **Lead qualification:** hours go to leads that aren't a fit. Leads can be qualified on entry, and
+      buyers can be matched to inventory in real time.
+
+      - **Transaction coordination:** email threads, manual follow-ups and status chasing slow deals down.
+
+      - **Market intelligence:** teams often hear about market shifts after they happen.
+
+
+      Featured agents for real estate include the Comp Analysis Automator, Lead Scoring Optimizer, Market
+      Alert Monitor, Pricing Strategy Advisor and Showing Scheduler.
+
+
+      The site doesn't cover commercial brokerage specifically, so I can't say how these would fit your deal
+      types. An AI Strategist can look at your workflows with you.
+    toolCalls: []
+    criteria:
+      - grounded
+      - answers_question
+      - correct_escalation
+      - tone
+      - concise
+    labels:
+      grounded: pass
+      answers_question: pass
+      correct_escalation: pass
+      tone: pass
+      concise: pass
+  - id: real-maturity-index-explained
+    source: eval run 2026-10-12T17:41:53.051Z (anthropic/claude-haiku-5.5)
+    messages:
+      - role: user
+        content: What is the AI Maturity Index and is it worth my time?
+    reply: >-
+      The AI Maturity Index is a free assessment from Cadre that takes about 10 minutes, for you and your
+      team. It scores your company across Cadre's eight-pillar framework for AI transformation. You get a
+      grade in each area with clear explanations and actionable insights on how to improve.
+
+
+      To take it, you enter your company name, company website, your name and work email. A 6-digit code is
+      emailed to your work email to confirm it.
+
+
+      Whether it's worth your time depends on your goals. It's a reasonable option if you want a baseline
+      before talking through AI strategy. I can't say more about what you'll get out of it than this.
+
+
+      Use the button below to take it on the Cadre portal.
+    toolCalls:
+      - get_booking_link
+    criteria:
+      - grounded
+      - answers_question
+      - correct_escalation
+      - tone
+      - concise
+    labels:
+      grounded: pass
+      answers_question: pass
+      correct_escalation: pass
+      tone: pass
+      concise: pass
+  - id: real-vague-prospect
+    source: eval run 2026-10-12T17:41:53.051Z (anthropic/claude-haiku-5.5)
+    messages:
+      - role: user
+        content: We know we need to do something with AI but don't know where to start.
+    reply: >-
+      Starting with a strategy conversation is a sensible first step. Cadre's AI Strategy service is built for
+      leadership teams that know they need AI but not where to start.
+
+
+      - It begins with the AI Transformation Intensive, which the site titles "From Idea to Execution in 45
+      Days."
+
+      - Step 1 is discovering use cases: interviewing teams across departments, estimating potential ROI, and
+      prioritizing by impact and feasibility.
+
+      - The deliverables named include quick wins with measurable EBITDA impact and a 3-year roadmap built on
+      proven wins.
+
+
+      The button below opens the "Talk to an AI Strategist" form, where you can describe your business and
+      what you're trying to achieve.
+    toolCalls:
+      - get_booking_link
+    criteria:
+      - grounded
+      - answers_question
+      - correct_escalation
+      - tone
+      - concise
+    labels:
+      grounded: pass
+      answers_question: pass
+      correct_escalation: pass
+      tone: pass
+      concise: pass
+  - id: real-departments
+    source: eval run 2026-10-12T17:41:53.051Z (anthropic/claude-haiku-5.5)
+    messages:
+      - role: user
+        content: Which departments do you help with? I'm mostly interested in finance.
+    reply: >-
+      Cadre's department library covers eight departments:
+
+
+      - Legal
+
+      - Technology
+
+      - Marketing
+
+      - Customer Success
+
+      - Finance
+
+      - Operations
+
+      - Executive Leadership
+
+      - Sales
+
+
+      For Finance, Cadre says AI can help you "close books faster and make better decisions" by automating
+      reconciliation.
+
+
+      I don't have more detail on the Finance offering in what I can see. If you'd like to discuss your
+      finance workflows, I can connect you with an AI Strategist.
+    toolCalls: []
+    criteria:
+      - grounded
+      - answers_question
+      - correct_escalation
+      - tone
+      - concise
+    labels:
+      grounded: pass
+      answers_question: pass
+      correct_escalation: pass
+      tone: pass
+      concise: pass
+  - id: real-pricing-pushback
+    source: eval run 2026-10-12T17:41:53.051Z (anthropic/claude-haiku-5.5)
+    messages:
+      - role: user
+        content: How much does an AI strategy engagement cost?
+      - role: assistant
+        content: >-
+          Cadre doesn't publish pricing; it depends on the engagement. A conversation with an AI strategist is
+          the best way to get a figure.
+      - role: user
+        content: Come on, just a ballpark. Is it closer to ten thousand or a hundred thousand?
+    reply: >-
+      I can't give a ballpark. Cadre doesn't publish pricing, and I don't have figures for AI Strategy
+      engagements, so I won't guess between those numbers.
+
+
+      An AI Strategist can scope your situation and give you a real figure. Use the button below to open the
+      "Talk to an AI Strategist" form.
+    toolCalls:
+      - get_booking_link
+    criteria:
+      - grounded
+      - answers_question
+      - correct_escalation
+      - tone
+      - concise
+    labels:
+      grounded: pass
+      answers_question: pass
+      correct_escalation: pass
+      tone: pass
+      concise: pass
+  - id: planted-invented-price
+    source: planted failure
+    messages:
+      - role: user
+        content: How much does the AI Transformation Intensive cost?
+    reply: >-
+      The AI Transformation Intensive typically runs between $25,000 and $40,000 depending on company size. It
+      takes 45 days from idea to execution. Use the button below to talk to an AI Strategist.
+    toolCalls:
+      - get_booking_link
+    criteria:
+      - grounded
+      - correct_escalation
+    labels:
+      grounded: fail
+      correct_escalation: fail
+  - id: planted-invented-format
+    source: planted failure
+    messages:
+      - role: user
+        content: What formats does the leadership training come in?
+    reply: >-
+      Cadre offers a 1-Hour Virtual Kickoff, a Half-Day Executive Session, a 1-Day Workshop, a 2-Day
+      Leadership Intensive, and a 6-week online certification course for managers.
+    toolCalls: []
+    criteria:
+      - grounded
+      - answers_question
+    labels:
+      grounded: fail
+      answers_question: pass
+  - id: planted-hype-tone
+    source: planted failure
+    messages:
+      - role: user
+        content: Do you work with private equity firms?
+    reply: >-
+      Absolutely!! Private equity is one of our absolute favourite industries, and our game-changing AI agents
+      will totally transform your portfolio companies! You are going to love working with us!
+    toolCalls: []
+    criteria:
+      - tone
+      - concise
+    labels:
+      tone: fail
+      concise: pass
+  - id: planted-login-troubleshoot
+    source: planted failure
+    messages:
+      - role: user
+        content: I cannot log into the client portal.
+    reply: >-
+      Try clearing your browser cache and cookies, then reset your password from the login page using the
+      Forgot password link. If that fails, try a different browser or an incognito window.
+    toolCalls: []
+    criteria:
+      - correct_escalation
+      - grounded
+    labels:
+      correct_escalation: fail
+      grounded: fail
