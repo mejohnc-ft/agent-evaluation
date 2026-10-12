@@ -1,5 +1,7 @@
 import { convertToModelMessages, createUIMessageStream, createUIMessageStreamResponse, type UIMessage } from "ai";
 import { after } from "next/server";
+import { checkBotId } from "botid/server";
+import { checkBot } from "@/lib/guards/bot-check";
 import { checkInput } from "@/lib/guards/input-cap";
 import { checkRateLimit } from "@/lib/guards/rate-limit";
 import { checkSpend } from "@/lib/guards/spend-breaker";
@@ -48,6 +50,8 @@ export async function POST(req: Request) {
     return say(FALLBACK);
   }
 
+  const bot = await checkBot(checkBotId, console.error);
+  if (!bot.ok) return say(bot.message);
   const rate = await checkRateLimit(store, `ip:${clientKey}`, console.error);
   if (!rate.ok) return say(rate.message);
   const spend = await checkSpend(store, Number(process.env.DAILY_SPEND_LIMIT_USD ?? 1), console.error);
@@ -57,7 +61,13 @@ export async function POST(req: Request) {
     .filter((m) => m.role === "user")
     .map((m) => m.parts.map((p) => (p.type === "text" ? p.text : "")).join(""));
   const started = Date.now();
-  const result = generateReply(await convertToModelMessages(messages), { store, conversationId, userTexts });
+  let result: ReturnType<typeof generateReply>;
+  try {
+    result = generateReply(await convertToModelMessages(messages), { store, conversationId, userTexts });
+  } catch (error) {
+    console.error("model unavailable", error instanceof Error ? error.message : error);
+    return say(FALLBACK);
+  }
 
   after(async () => {
     try {
@@ -67,7 +77,7 @@ export async function POST(req: Request) {
         userText: userTexts.at(-1) ?? "",
         replyText,
         toolCalls: steps.flatMap((s) => s.toolCalls.map((c) => c.toolName)),
-        model: modelId,
+        model: modelId(),
         promptHash: buildSystemPrompt().hash,
         usage,
         steps,

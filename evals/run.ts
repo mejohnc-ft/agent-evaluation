@@ -40,7 +40,7 @@ async function runOne(scenario: Scenario) {
   const stepCounts = { text: withText.length, mixed: withText.filter((step) => step.toolCalls.some((c) => c.toolName === "request_human_followup")).length };
   const failures = check(scenario, reply, toolCalls, stepCounts, knowledgeText);
   const ms = Date.now() - started;
-  const cost = costUsd(modelId, await result.usage, steps);
+  const cost = costUsd(modelId(), await result.usage, steps);
   let verdicts: Verdict[] = [];
   if (scenario.judge?.length) {
     verdicts = await judge({ messages, reply, toolCalls }, scenario.judge, knowledgeText);
@@ -69,7 +69,7 @@ async function main() {
   const totalCost = results.reduce((sum, r) => sum + r.costUsd, 0);
   const report = {
     runAt: new Date().toISOString(),
-    modelId,
+    modelId: modelId(),
     promptHash: buildSystemPrompt().hash,
     summary: {
       passed,
@@ -87,7 +87,7 @@ async function main() {
   writeFileSync("evals/results/latest.json", json);
 
   const { p50Ms, costPerScenarioUsd } = report.summary;
-  console.log(`\n${passed}/${results.length} passed (${Object.entries(byTier).map(([t, v]) => `${t} ${v}`).join(", ")}) · model ${modelId} · prompt ${report.promptHash}`);
+  console.log(`\n${passed}/${results.length} passed (${Object.entries(byTier).map(([t, v]) => `${t} ${v}`).join(", ")}) · model ${modelId()} · prompt ${report.promptHash}`);
   console.log(`p50 ${p50Ms} ms · $${costPerScenarioUsd.toFixed(5)} per scenario (model only)`);
   if (args.ci && passed < results.length) process.exit(1);
 }

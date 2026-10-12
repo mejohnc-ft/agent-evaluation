@@ -9,7 +9,7 @@ import { createTools } from "./tools";
 // The prompt is identical on every turn, so it is marked for provider-side caching.
 export function generateReply(messages: ModelMessage[], ctx: ToolContext) {
   return streamText({
-    model: chatModel,
+    model: chatModel(),
     instructions: {
       role: "system",
       content: buildSystemPrompt().text,
