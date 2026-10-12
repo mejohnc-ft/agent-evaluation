@@ -103,3 +103,19 @@ or press-and-hold, so real visitors see nothing.
 | BotID verification throws | fails open and logs; the rate limit and spend breaker still apply |
 
 Visitor sees: "I couldn't verify this browser. Please reload the page and try again, or email hello@gocadre.ai."
+
+## price-guard
+
+Cadre publishes no prices (D3), so a currency amount in a reply is invented unless the knowledge
+base states it verbatim (published results such as "$420,000 Saved Annually"). A stream transform
+after the link filter replaces every other amount with "[pricing isn't published]" before the
+visitor sees it, and records a `guard_checked` event (`price`, `block`) for the panel.
+
+| Failure mode | Behaviour |
+| --- | --- |
+| Model invents a price or range ("$25,000", "$25k", "$1.5M", "£2,000", "5000 dollars", "25,000 USD") | replaced |
+| Amount split across stream chunks ("$2" + "5,000"), or unit in the next chunk ("25,000 " + "dollars") | caught: the last two tokens are held until more text arrives |
+| Published amount ("$420,000", "$136,000") | kept |
+| Plain numbers, days, hours, percentages | untouched |
+
+Prompt rules and CI evals (`no_currency`) make this rare; the guard makes it impossible at runtime.

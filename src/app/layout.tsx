@@ -6,7 +6,7 @@ import { THEME_SCRIPT } from "./theme";
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://agent-evaluation-five.vercel.app"),
+  metadataBase: new URL("https://cadre.mejohnc.org"),
   title: { default: "Cadre AI Assistant", template: "%s · Cadre AI Assistant" },
   description: "Ask about Cadre AI's services, industries, and how to work with the team.",
   openGraph: {
