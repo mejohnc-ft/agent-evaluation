@@ -1,7 +1,7 @@
 import type { UIMessage } from "ai";
 import type { ContactFormFields } from "@/lib/tools/ui-types";
 import { AssistantMessage } from "./assistant-message";
-import { isContactSubmission } from "./message-text";
+import { isContactSubmission, lastTypedEmail } from "./message-text";
 import { TypingIndicator } from "./typing-indicator";
 import { UserMessage } from "./user-message";
 
@@ -29,6 +29,7 @@ export function MessageList({ messages, status, onContactSubmit }: Props) {
                 busy,
                 onContactSubmit,
                 contactSubmitted: messages.slice(i + 1).some(isContactSubmission),
+                prefillEmail: lastTypedEmail(messages.slice(0, i)),
               }}
             />
           )}

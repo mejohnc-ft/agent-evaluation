@@ -10,6 +10,7 @@ type Part = UIMessage["parts"][number];
 
 export type ToolCardContext = {
   contactSubmitted: boolean;
+  prefillEmail: string | undefined; // the visitor's own typed email from earlier messages
   busy: boolean;
   onContactSubmit: (fields: ContactFormFields) => void;
 };
@@ -37,6 +38,7 @@ export function ToolCard({ part, ctx }: { part: Part; ctx: ToolCardContext }) {
             id={`cf-${part.toolCallId}`}
             reason={form.reason}
             submitted={ctx.contactSubmitted}
+            prefillEmail={ctx.prefillEmail}
             disabled={ctx.busy}
             onSubmit={ctx.onContactSubmit}
           />

@@ -11,11 +11,12 @@ type Props = {
   id: string;
   reason: string;
   submitted: boolean; // a later visitor message already carries these details
+  prefillEmail: string | undefined; // typed by the visitor earlier; editable
   disabled: boolean;
   onSubmit: (fields: ContactFormFields) => void;
 };
 
-export function ContactFormCard({ id, reason, submitted, disabled, onSubmit }: Props) {
+export function ContactFormCard({ id, reason, submitted, prefillEmail, disabled, onSubmit }: Props) {
   const [errors, setErrors] = useState<ContactFormErrors>({});
   const [sent, setSent] = useState(false);
 
@@ -57,7 +58,17 @@ export function ContactFormCard({ id, reason, submitted, disabled, onSubmit }: P
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <FormField id={fid("name")} name="name" label="Name" autoComplete="name" maxLength={120} error={errors.name} />
-          <FormField id={fid("email")} name="email" label="Work email" type="email" autoComplete="email" maxLength={254} error={errors.email} />
+          <FormField
+            id={fid("email")}
+            name="email"
+            label="Work email"
+            hint={prefillEmail && "From your message"}
+            type="email"
+            autoComplete="email"
+            maxLength={254}
+            defaultValue={prefillEmail}
+            error={errors.email}
+          />
         </div>
         <FormField id={fid("company")} name="company" label="Company" hint="Optional" autoComplete="organization" maxLength={160} error={errors.company} />
         <FormField id={fid("need")} name="need" label="What do you need help with?" multiline maxLength={1000} error={errors.need} />
