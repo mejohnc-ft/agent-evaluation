@@ -1,4 +1,4 @@
-import { timingSafeEqual } from "node:crypto";
+import { matchesSecret } from "./secrets";
 
 // D15: how long each table keeps rows. Handoffs are the lead record until a CRM exists.
 export const RETENTION = [
@@ -20,8 +20,5 @@ export function retentionCutoffs(now: Date) {
 
 // Vercel Cron sends `Authorization: Bearer $CRON_SECRET`. No secret configured means no access.
 export function isAuthorizedCron(header: string | null, secret: string | undefined): boolean {
-  if (!secret || !header) return false;
-  const expected = Buffer.from(`Bearer ${secret}`);
-  const given = Buffer.from(header);
-  return given.length === expected.length && timingSafeEqual(given, expected);
+  return Boolean(secret) && matchesSecret(header, `Bearer ${secret}`);
 }

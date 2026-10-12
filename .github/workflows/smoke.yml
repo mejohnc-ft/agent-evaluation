@@ -1,9 +1,12 @@
 # G8: production smoke test. Vercel creates no GitHub deployment records for this repo, so
-# `deployment_status` never fires (D8). Run on push to main, after production serves this commit.
+# `deployment_status` never fires (D8). Run on push to main, after production serves this commit,
+# and every 30 minutes as an uptime check (GitHub emails the repo owner when a run fails).
 name: smoke
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: "*/30 * * * *"
   workflow_dispatch:
 
 jobs:
@@ -12,6 +15,7 @@ jobs:
     timeout-minutes: 15
     env:
       SMOKE_URL: https://agent-evaluation-five.vercel.app
+      SMOKE_TOKEN: ${{ secrets.SMOKE_TOKEN }} # skips only the bot check (D16)
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7

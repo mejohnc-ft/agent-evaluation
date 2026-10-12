@@ -4,6 +4,7 @@ import { checkBotId } from "botid/server";
 import { checkBot } from "@/lib/guards/bot-check";
 import { checkInput } from "@/lib/guards/input-cap";
 import { checkRateLimit } from "@/lib/guards/rate-limit";
+import { pass } from "@/lib/guards/messages";
 import { checkSpend } from "@/lib/guards/spend-breaker";
 import { modelId } from "@/lib/llm";
 import { buildSystemPrompt } from "@/lib/prompt/build";
@@ -11,6 +12,7 @@ import { generateReply } from "@/lib/reply";
 import { createSupabaseStore } from "@/lib/store/supabase";
 import { createMemoryStore } from "@/lib/store/memory";
 import type { Store } from "@/lib/store/types";
+import { matchesSecret } from "@/lib/secrets";
 import { logTurn } from "@/lib/turn-log";
 
 // Local development without Supabase credentials keeps everything in memory (never in production).
@@ -50,7 +52,9 @@ export async function POST(req: Request) {
     return say(FALLBACK);
   }
 
-  const bot = await checkBot(checkBotId, console.error);
+  // The scheduled smoke test runs headless; its secret token skips only the bot check (D16).
+  const trustedAutomation = matchesSecret(req.headers.get("x-smoke-token"), process.env.SMOKE_TOKEN);
+  const bot = trustedAutomation ? pass : await checkBot(checkBotId, console.error);
   if (!bot.ok) return say(bot.message);
   const rate = await checkRateLimit(store, `ip:${clientKey}`, console.error);
   if (!rate.ok) return say(rate.message);

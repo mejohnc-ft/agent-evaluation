@@ -121,6 +121,7 @@ Template:
 - Decision: Vercel BotID on `POST /api/chat` (invisible challenge, `checkBotId()` in the route before the rate limit). Bots get the friendly fallback without a model call. Fails open if BotID errors. Attack Mode in the Vercel Firewall stays the manual emergency switch.
 - Rejected: CAPTCHA or press-and-hold (friction on every real visitor of a support chat); a full load test (out of proportion for a demo; a burst on Preview proves the guard paths).
 - Evidence: `src/lib/guards/bot-check.test.ts` red before the guard existed, green after (63 tests).
+- Automation: the headless smoke test (G8 and the 30-minute uptime schedule) sends `x-smoke-token`; a constant-time match with `SMOKE_TOKEN` skips the bot check only, never the rate limit or spend breaker. The 256-bit token was generated straight into Vercel and GitHub and never printed. BotID's docs don't say Vercel's protection-bypass header exempts it, so this doesn't rely on that.
 - Revisit when: Deep Analysis is enabled in the Firewall, or bot traffic shows up in turn logs.
 
 ## D15: Retention periods and deletion requests
