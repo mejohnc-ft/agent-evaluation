@@ -9,7 +9,10 @@ export const showContactForm = tool({
     "Show the visitor a contact form (name, work email, company, what they need, consent) when they want the Cadre team to contact them and have not yet given their details. Use this instead of asking for an email in your reply.",
   inputSchema: z.object({
     intent: z.enum(["sales", "client_support", "security", "other"]),
-    reason: z.string().max(200).describe("One line on what the visitor wants help with, shown above the form"),
+    reason: z
+      .string()
+      .max(200)
+      .describe('Shown to the visitor on the form, so address them: a short phrase like "Scoping an AI agent for your support desk". Never "the visitor".'),
   }),
   execute: async ({ intent, reason }): Promise<ContactFormOutput> => ({ form: "contact", intent, reason }),
 });
