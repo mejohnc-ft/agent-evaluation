@@ -14,8 +14,9 @@
     "check:prompt": "tsx scripts/check-prompt.ts",
     "check:evals": "tsx scripts/check-eval-integrity.ts",
     "smoke": "playwright test",
-    "gate": "npm run typecheck && npm run lint && npm test && npm run check:kb && npm run check:prompt && npm run eval -- --tier 1 --ci",
-    "test": "vitest run"
+    "gate": "npm run typecheck && npm run lint && npm test && npm run check:kb && npm run check:prompt && npm run check:evals && npm run eval -- --tier 1 --ci",
+    "test": "vitest run",
+    "eval:calibrate": "tsx --env-file-if-exists=.env.local evals/calibrate.ts"
   },
   "dependencies": {
     "@ai-sdk/react": "4.0.140",
