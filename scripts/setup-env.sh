@@ -14,13 +14,15 @@ ask_secret() { # name, prompt
   [[ -n $value ]] && printf '%s' "$value" || current "$1"
 }
 
-# --push-vercel <var>...: copy named values into Vercel Production without printing them.
+# --push-vercel <var>...: copy named values into Vercel Production and Preview without printing them.
 if [[ ${1:-} == --push-vercel ]]; then
   shift
   for v in "$@"; do
     value=$(current "$v"); [[ -n $value ]] || { echo "$v: empty, skipped"; continue; }
-    vercel env rm "$v" production --yes >/dev/null 2>&1 || true
-    printf '%s' "$value" | vercel env add "$v" production >/dev/null && echo "$v: pushed to Production"
+    for target in production preview; do
+      vercel env rm "$v" "$target" --yes >/dev/null 2>&1 || true
+      printf '%s' "$value" | vercel env add "$v" "$target" --yes >/dev/null && echo "$v: pushed to $target"
+    done
   done
   exit 0
 fi
@@ -30,7 +32,7 @@ if [[ ${1:-} == --check ]]; then
   [[ -f $ENV_FILE ]] || { echo "$ENV_FILE missing"; exit 1; }
   bad=$(grep -vcE '^(#.*|[A-Z_]+=.*)?$' "$ENV_FILE" || true)
   echo "malformed lines: $bad"
-  for v in OPENROUTER_API_KEY MODEL_ID JUDGE_MODEL_ID SUPABASE_URL SUPABASE_SERVICE_ROLE_KEY RESEND_API_KEY; do
+  for v in OPENROUTER_API_KEY MODEL_ID JUDGE_MODEL_ID SUPABASE_URL SUPABASE_SERVICE_ROLE_KEY RESEND_API_KEY HANDOFF_NOTIFY_EMAIL; do
     [[ -n $(current "$v") ]] && echo "$v: set" || echo "$v: empty"
   done
   key=$(current OPENROUTER_API_KEY)
@@ -44,6 +46,8 @@ fi
 OPENROUTER_API_KEY=$(ask_secret OPENROUTER_API_KEY "Personal OpenRouter key (dev, NOT the Cadre key)")
 SUPABASE_SERVICE_ROLE_KEY=$(ask_secret SUPABASE_SERVICE_ROLE_KEY "Supabase service role key (Phase 2; may skip)")
 RESEND_API_KEY=$(ask_secret RESEND_API_KEY "Resend API key (optional; may skip)")
+read -rp "Handoff notify email [$(current HANDOFF_NOTIFY_EMAIL)]: " HANDOFF_NOTIFY_EMAIL
+HANDOFF_NOTIFY_EMAIL=${HANDOFF_NOTIFY_EMAIL:-$(current HANDOFF_NOTIFY_EMAIL)}
 
 if [[ -n $OPENROUTER_API_KEY && ! $OPENROUTER_API_KEY =~ ^sk-or-v1-[0-9a-f]{64}$ ]]; then
   echo "That doesn't look like an OpenRouter key (expected sk-or-v1- + 64 hex). Nothing written." >&2; exit 1
@@ -58,7 +62,7 @@ JUDGE_MODEL_ID=anthropic/claude-sonnet-5.5
 SUPABASE_URL=https://dbtidufiywzghiocijaa.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=$SUPABASE_SERVICE_ROLE_KEY
 RESEND_API_KEY=$RESEND_API_KEY
-HANDOFF_NOTIFY_EMAIL=$(current HANDOFF_NOTIFY_EMAIL)
+HANDOFF_NOTIFY_EMAIL=$HANDOFF_NOTIFY_EMAIL
 DAILY_SPEND_LIMIT_USD=1
 ENV
 echo "Wrote $ENV_FILE (mode 600)."
