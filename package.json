@@ -13,7 +13,8 @@
     "check:kb": "tsx scripts/check-kb.ts",
     "check:prompt": "tsx scripts/check-prompt.ts",
     "smoke": "playwright test",
-    "gate": "npm run typecheck && npm run lint && npm run check:kb && npm run check:prompt && npm run eval -- --tier 1 --ci"
+    "gate": "npm run typecheck && npm run lint && npm run check:kb && npm run check:prompt && npm run eval -- --tier 1 --ci",
+    "test": "vitest run"
   },
   "dependencies": {
     "@ai-sdk/react": "4.0.140",
@@ -37,7 +38,8 @@
     "js-yaml": "^5.4.3",
     "tailwindcss": "^4",
     "tsx": "^4.23.15",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.11"
   },
   "engines": {
     "node": "22.x"
