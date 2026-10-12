@@ -1,4 +1,4 @@
-# CI: typecheck, lint, tests, G3, G4 and the G6 Tier 1 eval gate. A Tier 1 failure blocks merge.
+# CI: typecheck, lint, tests, G3, G4, G7 (PRs) and the G6 Tier 1 eval gate. A Tier 1 failure blocks merge.
 name: ci
 on:
   pull_request:
@@ -15,6 +15,9 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
+        with:
+          # G7 diffs evals/scenarios.yaml against the PR base and reads PR commit messages.
+          fetch-depth: 0
       - uses: actions/setup-node@v7
         with:
           node-version: 22
@@ -27,6 +30,9 @@ jobs:
       - run: npm test --if-present
       - run: npm run check:kb
       - run: npm run check:prompt
+      - name: Eval integrity (G7)
+        if: github.event_name == 'pull_request'
+        run: npm run check:evals -- --base origin/${{ github.base_ref || 'main' }}
       - name: Tier 1 evals
         run: npm run eval -- --tier 1 --ci
         env:
