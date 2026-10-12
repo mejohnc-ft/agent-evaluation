@@ -66,3 +66,4 @@ as $$
 $$;
 
 revoke execute on function bump_rate(text, int) from public, anon, authenticated;
+grant execute on function bump_rate(text, int) to service_role;
