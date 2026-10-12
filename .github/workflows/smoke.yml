@@ -1,0 +1,33 @@
+# G8: production smoke test. Vercel creates no GitHub deployment records for this repo, so
+# `deployment_status` never fires (D8). Run on push to main, after production serves this commit.
+name: smoke
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SMOKE_URL: https://agent-evaluation-five.vercel.app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Wait for production to serve this commit
+        if: github.event_name == 'push'
+        run: |
+          for i in $(seq 1 30); do
+            live=$(curl -fsS "$SMOKE_URL/api/version" | jq -r .commit || true)
+            [ "$live" = "$GITHUB_SHA" ] && echo "live: $live" && exit 0
+            echo "waiting ($i/30): production is at ${live:-unknown}"
+            sleep 10
+          done
+          echo "production did not reach $GITHUB_SHA within 5 minutes" && exit 1
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
