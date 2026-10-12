@@ -81,7 +81,7 @@ Never cut: G1, G3, the Tier 1 eval gate, G8, the handoff row, honest escalation,
 - **I need:** evidence the bot is correct beyond keyword checks, and a model chosen on data.
 - **You get:** rubric, calibrated judge, Tier 2 and 3 scenarios (~28 total), model comparison; G7.
 - **Done looks like:** judge agreement recorded; Tier 1 100%, Tier 2 90%+; decision logged; tag `level-2`.
-- [ ] Status · Actual time: · Notes:
+- [x] Status · Actual time: 2026-10-12 10:37–11:43 (merge e7ee71c) · Notes: 33 scenarios (Tier 1 21, Tier 2 6, Tier 3 6). Judge calibrated 10/10 after two rubric changes (D6). Model: Haiku 5.5 kept over GPT-6 Luna and Sonnet 5.5 (D5). G7 eval integrity in CI and the gate. Tier 1 100% and Tier 3 100% in every run; **Tier 2 89% (16/18 on the calibrated rubric), just under the 90% target**: the misses are small groundedness slips the judge correctly catches (describing a page's contents beyond the KB). Also shipped in this phase: generative UI (`show_contact_form`, D14) with a Cadre visual system and an Apple HIG pass; BotID (D16); retention cron and deletion requests (D15); lazy model load so builds need no secrets; 30-minute uptime smoke; design.md, icons and share image. Production: smoke green through BotID with the token, plain curl blocked, cron 401 without secret. Pending owner: Sentry integration, Resend notify email, Cadre key swap (D13).
 
 ## Phase 4: Level 3 item (5:30–6:30)
 
@@ -103,6 +103,8 @@ Never cut: G1, G3, the Tier 1 eval gate, G8, the handoff row, honest escalation,
 | --- | --- | --- |
 | 0:35 | Tier 1 is 14 scenarios, not 12 | Two added for the company-size and MIT traps |
 | 1:05 | Cadre key swap and Resend notify env moved to final QA (D13) | Owner's call; guards verified in production |
+| 2:15 | Runtime price guard parked | Prices are prevented by prompt rules and CI-blocking evals; runtime enforcement deferred |
+| 2:15 | Calibration labels delegated to Claude (D6) | Owner's call; synthetic items labelled by construction |
 
 ## Parking lot
 
