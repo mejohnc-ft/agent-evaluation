@@ -67,7 +67,7 @@ Never cut: G1, G3, the Tier 1 eval gate, G8, the handoff row, honest escalation,
 - **I need:** correct, sourced answers to the six brief scenarios.
 - **You get:** `knowledge/*.md`, `links.md`, `system.md`, prompt builder, eval runner, 12 Tier 1 scenarios; G3, G4, G8.
 - **Done looks like:** Tier 1 12/12; smoke test green on production; tag `level-1`.
-- [ ] Status · Actual time: · Notes:
+- [x] Status · Actual time: 2026-10-12 09:40–09:58 (commits 09:54, merge f1f40d2 09:57) · Notes: Tier 1 grew to 14 scenarios (two added for the company-size and MIT traps): baseline 8/14, then 14/14 after the KB review (D9–D11). `npm run gate` exit 0 on main: `check:kb ok: 22 links`, `check:prompt ok: 947ce5f04089, ~6670 tokens`, `14/14 passed · model anthropic/claude-haiku-5.5`. G3 and G4 each proven failing once. G8 smoke run 38280970922 green on production (56s) after `/api/version` served f1f40d2; the trigger moved to push on main (D8). Push-to-deploy now works from Git (production live ~30s after merge). Vercel still posts no GitHub deployments or checks. Preview builds need `OPENROUTER_API_KEY` in Preview. Node still 24.x on Vercel.
 
 ## Phase 2: Tools, handoff, guardrails, CI (2:30–4:30)
 
