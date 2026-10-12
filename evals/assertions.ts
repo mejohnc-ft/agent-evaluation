@@ -42,6 +42,11 @@ export function check(scenario: Scenario, rawReply: string, toolCalls: ToolCall[
   if (!reply.trim()) return ["empty reply", ...failures];
   // Text before and after a tool call shows the visitor two answers in one bubble.
   if (steps.text > 1) failures.push(`single_reply: text in ${steps.text} steps`);
+  // A reply that points to a card must have asked for one; otherwise the visitor looks for a button that isn't there.
+  const cardTools = ["get_booking_link", "show_contact_form"];
+  if (/\b(button|form) below\b|\bbelow is the (button|form)\b|\bthe button (below|opens)\b/i.test(reply) && !toolCalls.some((c) => cardTools.includes(c.name))) {
+    failures.push("phantom_card: mentions a button or form but no card tool was called");
+  }
   // Text written in the same step as the handoff call can't know whether the row was written.
   if (steps.mixed) failures.push("handoff_claim_after_result: text written alongside request_human_followup");
 
