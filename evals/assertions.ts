@@ -35,7 +35,9 @@ export function conversation(scenario: Scenario): Turn[] {
 }
 
 // Returns one message per failed check; empty means pass.
-export function check(scenario: Scenario, reply: string, toolCalls: ToolCall[], steps: { text: number; mixed: number }, knowledgeText: string): string[] {
+export function check(scenario: Scenario, rawReply: string, toolCalls: ToolCall[], steps: { text: number; mixed: number }, knowledgeText: string): string[] {
+  // Typographic quotes (can’t, “x”) must not slip past patterns written with straight ones.
+  const reply = rawReply.replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"');
   const failures = checkTools(scenario, toolCalls);
   if (!reply.trim()) return ["empty reply", ...failures];
   // Text before and after a tool call shows the visitor two answers in one bubble.
