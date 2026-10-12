@@ -1,4 +1,5 @@
 import type { LanguageModelUsage, ProviderMetadata } from "ai";
+import { redactContacts } from "./redact";
 import type { Store, TurnRow } from "./store/types";
 
 // USD per million tokens (OpenRouter, D7). Unknown models are billed at the highest rate so
@@ -9,10 +10,6 @@ const RATES: Record<string, { input: number; cached: number; output: number }> =
 };
 const FALLBACK_RATE = RATES["anthropic/claude-sonnet-5.5"];
 
-const EMAIL = /[^\s@<>()]+@[^\s@<>()]+\.[a-z]{2,}/gi;
-
-// Conversation logs keep content without contact details (path-to-production.md).
-const redactContacts = (text: string) => text.replace(EMAIL, "[email]");
 
 // OpenRouter's billed cost when every step reports it; otherwise an estimate from the rate table.
 export function costUsd(model: string, usage: LanguageModelUsage, steps: { providerMetadata?: ProviderMetadata }[]): number {

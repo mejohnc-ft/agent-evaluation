@@ -28,7 +28,7 @@ export async function deleteContact(by: { email: string } | { conversationId: st
   }
 
   const deleted: Record<string, number> = {};
-  for (const table of ["handoffs", "knowledge_gaps", "conversation_turns"] as const) {
+  for (const table of ["handoffs", "knowledge_gaps", "conversation_turns", "events"] as const) {
     const { count, error } = await db.from(table).delete({ count: "exact" }).in("conversation_id", conversationIds);
     if (error) throw new StoreError(`delete ${table} failed: ${error.message}`);
     deleted[table] = count ?? 0;

@@ -7,6 +7,7 @@ export type BookingLinkOutput = { purpose: BookingPurpose; label: string; url: s
 export type ContactFormOutput = { form: "contact"; intent: HandoffIntent; reason: string };
 export type HandoffOutput = { ok: true; id: string } | { ok: false; error: string };
 export type GapOutput = { logged: true };
+export type PageLinkOutput = { label: string; url: string; description: string };
 
 // The contact form submits this text as the visitor's own message, so contact provenance holds
 // (the email is typed by the visitor) and request_human_followup stays the only handoff path.

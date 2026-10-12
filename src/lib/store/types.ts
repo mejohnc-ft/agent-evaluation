@@ -1,3 +1,5 @@
+import type { AppEvent } from "../events/types";
+
 // The persistence contract. Supabase in production (store/supabase.ts), in-memory for evals
 // and tests (store/memory.ts). Nothing else imports a database client.
 
@@ -34,6 +36,7 @@ export interface Store {
   insertHandoff(row: HandoffRow): Promise<{ id: string }>;
   insertGap(row: GapRow): Promise<void>;
   insertTurn(row: TurnRow): Promise<void>;
+  insertEvent(event: AppEvent): Promise<void>;
   // Increments the counter for `key` in the current fixed window and returns the new count.
   bumpRate(key: string, windowSeconds: number): Promise<number>;
   // Sum of costUsd for turns since 00:00 UTC today.

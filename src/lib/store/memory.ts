@@ -1,3 +1,4 @@
+import type { AppEvent } from "../events/types";
 import type { GapRow, HandoffRow, Store, TurnRow } from "./types";
 
 // In-memory Store for evals and tests. The arrays are exposed so callers can inspect writes.
@@ -6,6 +7,7 @@ export function createMemoryStore() {
   const handoffs: (HandoffRow & { id: string })[] = [];
   const gaps: GapRow[] = [];
   const turns: TurnRow[] = [];
+  const events: AppEvent[] = [];
   const rates = new Map<string, number>();
 
   const store: Store = {
@@ -20,6 +22,9 @@ export function createMemoryStore() {
     async insertTurn(row) {
       turns.push(row);
     },
+    async insertEvent(event) {
+      events.push(event);
+    },
     async bumpRate(key) {
       const count = (rates.get(key) ?? 0) + 1;
       rates.set(key, count);
@@ -29,7 +34,7 @@ export function createMemoryStore() {
       return turns.reduce((sum, turn) => sum + turn.costUsd, 0);
     },
   };
-  return { ...store, handoffs, gaps, turns };
+  return { ...store, handoffs, gaps, turns, events };
 }
 
 export type MemoryStore = ReturnType<typeof createMemoryStore>;
