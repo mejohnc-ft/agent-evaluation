@@ -1,26 +1,177 @@
 @import "tailwindcss";
 
+/*
+ * Design tokens taken from cadre.ai's production CSS (/_next/static/immutable/chunks/*.css):
+ * --cadre-red #db4545, --red-soft #fbe9e9, --colors--black-50…900, --cadre-sand-dark #f2efe4,
+ * --wf-hairline #0000001a, --wf-ease-out-expo cubic-bezier(.19,1,.22,1), --v-radius-* and
+ * --v-shadow-card. #db4545 with white text is 4.24:1, so filled buttons use a deeper step
+ * (#c43a3a, 5.23:1) to meet WCAG AA; the brand red stays for focus rings and accents.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --surface: #ffffff;
+  --surface-sunken: #f9f9f9; /* black-50 */
+  --bubble: #f2efe4; /* cadre-sand-dark */
+  --ink: #0c0407; /* black-900 */
+  --ink-2: #333333; /* black-800 */
+  --muted: #666666; /* black-600, 5.7:1 */
+  --faint: #737373; /* placeholder, 4.7:1 */
+  --hairline: #0000001a; /* wf-hairline */
+  --hairline-strong: #00000033;
+  --accent: #db4545; /* cadre-red */
+  --accent-ink: #c43a3a; /* red text on white, 5.2:1 */
+  --accent-fill: #c43a3a;
+  --accent-fill-hover: #a93131;
+  --accent-soft: #fbe9e9; /* red-soft */
+  --ink-fill: #0c0407;
+  --ink-fill-hover: #333333;
+  --on-ink: #ffffff;
+  --card-shadow: 0 28px 32px #00000008, 0 1px 2px #0000000a; /* v-shadow-card + lift */
+  color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --surface: #0f0c0d;
+    --surface-sunken: #171314;
+    --bubble: #241e1f;
+    --ink: #f4f2f1;
+    --ink-2: #dedad9;
+    --muted: #a8a3a2;
+    --faint: #8f8a89;
+    --hairline: #ffffff1a;
+    --hairline-strong: #ffffff33;
+    --accent: #ec6a6a;
+    --accent-ink: #f07a7a;
+    --accent-fill: #c43a3a;
+    --accent-fill-hover: #d24a4a;
+    --accent-soft: #2c1617;
+    --ink-fill: #f4f2f1;
+    --ink-fill-hover: #ffffff;
+    --on-ink: #0c0407;
+    --card-shadow: 0 1px 0 #ffffff0a inset, 0 24px 32px #00000040;
+    color-scheme: dark;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@theme inline {
+  --color-surface: var(--surface);
+  --color-sunken: var(--surface-sunken);
+  --color-bubble: var(--bubble);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-hairline: var(--hairline);
+  --color-hairline-strong: var(--hairline-strong);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-fill: var(--accent-fill);
+  --color-accent-fill-hover: var(--accent-fill-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-ink-fill: var(--ink-fill);
+  --color-ink-fill-hover: var(--ink-fill-hover);
+  --color-on-ink: var(--on-ink);
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --shadow-card: var(--card-shadow);
+  --radius-input: 0.5rem; /* v-radius-input */
+  --radius-card: 1rem; /* v-radius-card */
+  --radius-panel: 1.5rem; /* v-radius-panel */
+  --radius-button: 2.25rem; /* v-radius-button */
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1); /* wf-ease-out-expo */
+  --animate-rise: rise 0.6s var(--ease-out-expo) both;
+  --animate-pulse-dot: pulse-dot 1.2s ease-in-out infinite;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+  @keyframes pulse-dot {
+    0%,
+    100% {
+      opacity: 0.25;
+    }
+    40% {
+      opacity: 1;
+    }
+  }
+}
+
+/* Text fields draw their own focus state (border + ring), so the global outline skips them. */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background: var(--surface);
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+
+  :where(a, button, [tabindex], input[type="checkbox"]):focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--accent-soft);
+    color: var(--ink);
+  }
+}
+
+/* Assistant prose: react-markdown output. */
+.chat-prose {
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+.chat-prose > * + * {
+  margin-top: 0.75em;
+}
+.chat-prose strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+.chat-prose ul,
+.chat-prose ol {
+  padding-left: 1.25rem;
+}
+.chat-prose ul {
+  list-style: disc;
+}
+.chat-prose ol {
+  list-style: decimal;
+}
+.chat-prose li + li {
+  margin-top: 0.35em;
+}
+.chat-prose li::marker {
+  color: var(--faint);
+}
+.chat-prose code {
+  font-size: 0.875em;
+  background: var(--surface-sunken);
+  border: 1px solid var(--hairline);
+  border-radius: 0.3rem;
+  padding: 0.05em 0.3em;
+}
+.chat-prose blockquote {
+  border-left: 2px solid var(--hairline-strong);
+  padding-left: 0.875rem;
+  color: var(--muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
