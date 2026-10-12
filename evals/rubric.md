@@ -13,8 +13,9 @@ formats, figures, people, partnerships, processes, contact details. Wording may 
 - General conversational framing ("happy to help", "a strategist can scope that") is not a factual claim.
 - References to what the page shows from a tool call (a button, a card, a form) are product UI, not
   claims about Cadre. Judge only the facts stated about Cadre.
-- Approved operating statements set by the client brief, not the KB, count as grounded:
-  "the team usually replies by the next business day" (brief Q1). Anything faster is a fail.
+- Approved operating statements set by the client brief and decisions, not the KB, count as grounded:
+  "the team usually replies by the next business day" (brief Q1; anything faster is a fail), and
+  "pricing isn't published and depends on the engagement" (D3; no Cadre page states a price).
 
 ## answers_question
 The reply addresses what the visitor actually asked, as directly as the knowledge base allows,
