@@ -81,3 +81,17 @@ Template:
 - Rejected: repeating the figures with "according to Cadre's site" (still spreads an unverified number).
 - Evidence: Tier 1 `mit-statistic` and `anthropic-partner` failed on the baseline; both pass after (eval run 947ce5f04089, 14/14).
 - Revisit when: Cadre supplies the primary sources or confirms the Anthropic relationship.
+
+## D12: Supabase MCP is hosted, project-scoped, and read-only outside migrations
+- Context: the stdio Supabase MCP needed a personal access token in `SUPABASE_ACCESS_TOKEN` (never set) and ran `--read-only`, so it could neither authenticate nor apply the Phase 2 migration.
+- Decision: `.mcp.json` uses the hosted server with browser OAuth, scoped to `dbtidufiywzghiocijaa`. Writes were enabled only to apply `0001_init` and remove the QA handoff row; `read_only=true` from Phase 2 close.
+- Rejected: a personal access token in the shell environment (another long-lived secret); a permanently writable MCP (Claude could change production data outside a migration).
+- Evidence: migration `init` applied 2026-10-12; security advisor reports only the intended `rls_enabled_no_policy`.
+- Revisit when: a new migration is needed (drop `read_only` for that change only).
+
+## D13: Production keeps the personal OpenRouter key past Phase 2
+- Context: D7 planned the Cadre key in Production once the rate limit and spend breaker were verified there. Both are verified (rate limit tripped at request 21; spend breaker fails closed, unit-tested), but the owner chose to keep the personal key for now.
+- Decision: the personal key stays in Production; the Cadre key swap moves to final QA.
+- Rejected: swapping now (no need while traffic is only testing).
+- Evidence: production QA 2026-10-12 17:24–17:25 UTC: 21 turns cost $0.0045 total.
+- Revisit when: final QA, before submission.

@@ -74,7 +74,7 @@ Never cut: G1, G3, the Tier 1 eval gate, G8, the handoff row, honest escalation,
 - **I need:** a visitor can reach a human with context; abuse can't break the bot or drain the key.
 - **You get:** three tools, Supabase tables, runtime guardrails, turn logging, CI; G5.
 - **Done looks like:** production handoff creates a row; gap logged on an unknown question; rate limit trips; CI green on the merged PR; Vercel Production switched to the Cadre key after the rate limit and spend breaker are verified there (D7).
-- [ ] Status · Actual time: · Notes:
+- [x] Status · Actual time: 2026-10-12 10:01–10:30 (contract e8af04f 10:03, merge 7689674 10:23) · Notes: Built as three parallel worktree tracks (data layer, guards, CI/evals) on a shared `Store` contract, then sequential integration. G5: 54 guard tests red before the guards existed, green after. Tier 1 grew to 19 (five tool scenarios); new global checks `single_reply` and `handoff_claim_after_result` caught a duplicated-reply bug in 3 scenarios, fixed with a stop rule in `generateReply`. `npm run gate` exit 0: `54 passed`, `check:prompt ok: 178ddf9b415e`, `19/19 passed`. CI green on PR #2 and main; G8 smoke green on 7689674. Production: gap row logged; handoff row written with the typed email, confirmed only after `ok: true` (QA row then deleted); rate limit tripped at request 21; 21 turns logged with no emails, $0.0045 total. Deferred: Resend notification env and the Cadre key swap (D13), both to final QA. Supabase MCP read-only again (D12).
 
 ## Phase 3: Eval depth and model choice (4:30–5:30)
 
@@ -101,7 +101,8 @@ Never cut: G1, G3, the Tier 1 eval gate, G8, the handoff row, honest escalation,
 
 | Time | Change | Reason |
 | --- | --- | --- |
-| | | |
+| 0:35 | Tier 1 is 14 scenarios, not 12 | Two added for the company-size and MIT traps |
+| 1:05 | Cadre key swap and Resend notify env moved to final QA (D13) | Owner's call; guards verified in production |
 
 ## Parking lot
 
