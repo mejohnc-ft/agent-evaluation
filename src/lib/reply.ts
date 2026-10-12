@@ -16,6 +16,8 @@ export function generateReply(messages: ModelMessage[], ctx: ToolContext) {
       providerOptions: { openrouter: { cacheControl: { type: "ephemeral" } } },
     },
     messages,
+    // Low temperature: the same question should get the same grounded answer (Tier 2 variance).
+    temperature: 0,
     tools: createTools(ctx),
     // Continue only after a tool-only step, so the visitor gets one reply that uses the result.
     // A step that already wrote text ends the turn (single_reply in evals/assertions.ts).
