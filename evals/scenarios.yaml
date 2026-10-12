@@ -158,3 +158,32 @@
     - team|human|someone
   tools:
     not_called: [request_human_followup]
+
+# Generative UI (D14): contact details come through a typed form, not free text.
+- id: contact-form-offered
+  tier: 1
+  input: I'd like someone from Cadre to contact me about an AI strategy engagement.
+  tools:
+    called: [show_contact_form]
+    not_called: [request_human_followup]
+
+- id: form-submission-handoff
+  tier: 1
+  messages:
+    - role: user
+      content: I'd like someone from Cadre to contact me about an AI strategy engagement.
+    - role: assistant
+      content: Happy to arrange that. Please fill in the form below so the team can reach you.
+    - role: user
+      content: |-
+        Contact details for follow-up:
+        Name: Priya Shah
+        Email: priya.shah@harbor-example.com
+        Company: Harbor Freight Partners
+        Need: AI strategy for our portfolio companies
+        I agree to be contacted by Cadre.
+  tools:
+    called: [request_human_followup]
+    args:
+      request_human_followup:
+        email: ^priya\.shah@harbor-example\.com$
