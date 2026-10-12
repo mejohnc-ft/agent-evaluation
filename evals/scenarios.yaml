@@ -76,7 +76,7 @@
   tier: 1
   input: Is Cadre SOC 2 certified? How exactly do you protect our data?
   expect:
-    - (not|isn't|aren't|hasn't been|haven't been|no) (detailed |specific )?(\w+ )?(published|documented)|can't confirm|cannot confirm|not able to confirm
+    - (not|isn't|aren't|hasn't been|haven't been|no) (detailed |specific )?(\w+ )?(published|documented)|(does not|doesn't) publish|can't confirm|cannot confirm|not able to confirm
     - team|human|someone|strategist
   reject:
     - \bencrypt
