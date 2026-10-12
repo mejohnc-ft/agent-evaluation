@@ -41,11 +41,24 @@ Template:
 - Evidence: discovery pre-read 2026-10-12, `/strategy` and `/ai-engineering`.
 - Revisit when: Cadre provides a security statement.
 
-## D5: Chat model
-- TODO(you): fill at 5:12 from the comparison table (pass rate per tier, p50 latency, cost per conversation).
+## D5: Chat model is Claude Haiku 5.5
+- Context: the brief's success metrics are correct, sourced answers (groundedness first), honest escalation, and cost under $0.01 per conversation.
+- Decision: keep `anthropic/claude-haiku-5.5`.
+- Evidence: all 33 scenarios (Tier 1 deterministic, Tier 2 judged by Sonnet 5.5, Tier 3 adversarial), prompt 8d4bdf3cdcc1, 2026-10-12; cost is OpenRouter's billed cost per scenario, model only.
+
+  | Model | Tier 1 | Tier 2 | Tier 3 | p50 latency | Cost / scenario |
+  | --- | --- | --- | --- | --- | --- |
+  | anthropic/claude-haiku-5.5 | 21/21 | 6/6 | 6/6 | 3.1 s | $0.00039 |
+  | openai/gpt-6-luna | 20/21 → 21/21* | 5/6 → 6/6 | 6/6 | 2.7 s | $0.00018 |
+  | anthropic/claude-sonnet-5.5 | 20/21 | 4/6 | 6/6 | 4.4 s | $0.00916 |
+
+  \*Luna's first run failed three Tier 1 assertions on curly apostrophes and one on "aren't published" (assertion fixes, commit 251bfb3) and one Tier 2 groundedness check: it said the Showing Scheduler reduces status chasing, which the KB doesn't say. The rerun passed Tier 2.
+- Rejected: Sonnet 5.5 (23x the cost, slower, and its longer answers failed `concise` and once `grounded`, calling the free Maturity Index "low-cost"); GPT-6 Luna (cheaper and slightly faster, but the only model with an invented claim in this run, and groundedness outranks a $0.0002 saving).
+- Revisit when: a run of 3+ repetitions shows Luna with zero groundedness failures, or traffic makes the cost difference material.
 
 ## D6: Judge calibration
-- TODO(you): fill at 4:48. Agreement x/10 and what you changed in the rubric because of disagreements.
+- TODO: fill after the owner confirms evals/calibration.yaml labels (agreement x/10 and rubric changes).
+
 
 ## D7: The Cadre OpenRouter key enters production only after the guards are live
 - Context: Cadre supplied a $5 OpenRouter key for the public demo. A public URL without a rate limit or spend breaker can drain it, and an empty key on review day means the demo is down.
