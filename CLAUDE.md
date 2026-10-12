@@ -8,7 +8,7 @@ Success is correct, sourced answers and a clean handoff, not broad coverage.
 
 ## Stack and layout
 
-- Next.js App Router (React) + TypeScript on Vercel; Node 22. DNS on Cloudflare (DNS only, no proxy).
+- Next.js 16 App Router (React) + TypeScript on Vercel; Node 22. Next 16 differs from training data: check `node_modules/next/dist/docs/` first (see `AGENTS.md`).
 - LLM: OpenRouter via `@openrouter/ai-sdk-provider` and the Vercel AI SDK. Chat model `anthropic/claude-haiku-5.5` (D5); judge model Sonnet 5.5.
 - Supabase Postgres: `handoffs`, `knowledge_gaps`, `conversation_turns`, `rate_counters`. RLS on, no policies; service role key server-side only.
 - Resend: best-effort handoff notification to the owner inbox. The `handoffs` row is the record.
