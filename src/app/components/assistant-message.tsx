@@ -19,7 +19,7 @@ export function AssistantMessage({
   const waiting = streaming && (texts.length === 0 || message.parts.at(-1)?.type !== "text");
 
   return (
-    <div className="flex animate-rise flex-col gap-4" data-testid="assistant-message">
+    <div className="flex animate-rise flex-col gap-5" data-testid="assistant-message">
       {texts.map(({ i, text }) => (
         <Markdown key={i} text={text} />
       ))}

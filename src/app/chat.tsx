@@ -26,8 +26,8 @@ export function Chat() {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto w-full max-w-[42rem] flex-1 px-5">
-        <div ref={contentRef}>
+      <main className="gutter w-full flex-1">
+        <div ref={contentRef} className="mx-auto max-w-[42rem]">
           {messages.length === 0 ? (
             <EmptyState onPick={send} disabled={busy} />
           ) : (
@@ -51,15 +51,15 @@ export function Chat() {
         </div>
       </main>
       <footer className="sticky bottom-0 z-10 bg-gradient-to-t from-surface from-70% to-transparent pt-6">
-        <div className="mx-auto w-full max-w-[42rem] px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-5">
+        <div className="gutter mx-auto box-content max-w-[42rem] pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           <Composer onSend={send} busy={busy} />
-          <p id="composer-help" className="mt-2.5 px-2 text-center text-xs leading-relaxed text-muted">
+          <p id="composer-help" className="mt-3 px-2 text-center text-caption text-muted">
             You&apos;re chatting with an AI assistant. Details you share for a follow-up go to the Cadre team.{" "}
             <a
               href="https://cadre.ai/legal/privacy-policy"
               target="_blank"
               rel="noopener noreferrer"
-              className="underline decoration-hairline-strong underline-offset-2 hover:text-ink hover:decoration-ink"
+              className="hit-44 underline decoration-hairline-strong underline-offset-2 hover:text-ink hover:decoration-ink"
             >
               Privacy policy
             </a>

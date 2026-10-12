@@ -32,7 +32,7 @@ export function Composer({ onSend, busy }: { onSend: (text: string) => void; bus
         e.preventDefault();
         submit();
       }}
-      className="flex items-end gap-2 rounded-[1.5rem] border border-hairline-strong bg-surface p-1.5 pl-1 shadow-card transition-[border-color,box-shadow] duration-300 ease-out-expo focus-within:border-ink/40 focus-within:ring-4 focus-within:ring-ink/5"
+      className="flex items-end gap-2 rounded-[1.75rem] border border-hairline-strong bg-surface p-2 shadow-card transition-[border-color,box-shadow] duration-300 ease-out-expo focus-within:border-ink/60 focus-within:ring-[3px] focus-within:ring-ink/8"
     >
       <label htmlFor="composer" className="sr-only">
         Message the Cadre AI assistant
@@ -52,12 +52,12 @@ export function Composer({ onSend, busy }: { onSend: (text: string) => void; bus
             submit();
           }
         }}
-        className="block max-h-[200px] min-w-0 flex-1 resize-none bg-transparent py-2 pl-3.5 text-base leading-6 text-ink placeholder:text-faint focus:outline-none focus-visible:outline-none"
+        className="block max-h-[200px] min-h-11 min-w-0 flex-1 resize-none bg-transparent py-2.5 pl-3 text-body text-ink placeholder:text-faint focus:outline-none focus-visible:outline-none"
       />
       <div className="flex shrink-0 items-center gap-3">
         {value.length >= COUNTER_FROM && (
           <span
-            className={`text-xs tabular-nums ${value.length >= MAX_CHARS - 50 ? "text-accent-ink" : "text-muted"}`}
+            className={`text-caption tabular-nums ${value.length >= MAX_CHARS - 50 ? "text-accent-ink" : "text-muted"}`}
             aria-label={`${value.length} of ${MAX_CHARS} characters`}
           >
             {value.length.toLocaleString("en-US")} / {MAX_CHARS.toLocaleString("en-US")}
@@ -67,7 +67,7 @@ export function Composer({ onSend, busy }: { onSend: (text: string) => void; bus
           type="submit"
           disabled={!canSend}
           aria-label="Send message"
-          className="grid size-9 place-items-center rounded-full bg-ink-fill text-on-ink transition-[background-color,opacity,transform] duration-300 ease-out-expo hover:bg-ink-fill-hover active:scale-95 disabled:cursor-not-allowed disabled:opacity-25"
+          className="grid size-11 place-items-center rounded-full bg-ink-fill text-on-ink transition-[background-color,opacity,transform] duration-300 ease-out-expo hover:bg-ink-fill-hover active:scale-95 disabled:cursor-not-allowed disabled:opacity-25"
         >
           <ArrowUp className="size-[1.125rem]" />
         </button>

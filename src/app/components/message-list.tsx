@@ -16,7 +16,7 @@ export function MessageList({ messages, status, onContactSubmit }: Props) {
   const last = messages.at(-1);
 
   return (
-    <ol className="flex flex-col gap-7 pt-8 pb-10" aria-label="Conversation">
+    <ol className="flex flex-col gap-8 pt-8 pb-10" aria-label="Conversation">
       {messages.map((message, i) => (
         <li key={message.id}>
           {message.role === "user" ? (

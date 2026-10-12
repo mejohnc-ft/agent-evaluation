@@ -72,13 +72,37 @@
   --color-ink-fill-hover: var(--ink-fill-hover);
   --color-on-ink: var(--on-ink);
   --font-sans: var(--font-inter), system-ui, sans-serif;
+
+  /* Type scale: seven steps mapped to Apple's text styles (HIG), each with its own leading and
+     tracking. Tight for display, open for small text. */
+  --text-display: 2.125rem; /* Large Title */
+  --text-display--line-height: 2.5rem;
+  --text-display--letter-spacing: -0.022em;
+  --text-title: 1.25rem; /* Title 3 */
+  --text-title--line-height: 1.75rem;
+  --text-title--letter-spacing: -0.012em;
+  --text-headline: 1.0625rem; /* Headline */
+  --text-headline--line-height: 1.5rem;
+  --text-headline--letter-spacing: -0.012em;
+  --text-body: 1rem; /* Body */
+  --text-body--line-height: 1.625rem;
+  --text-body--letter-spacing: -0.006em;
+  --text-callout: 0.9375rem; /* Callout */
+  --text-callout--line-height: 1.375rem;
+  --text-callout--letter-spacing: -0.004em;
+  --text-footnote: 0.8125rem; /* Footnote */
+  --text-footnote--line-height: 1.125rem;
+  --text-footnote--letter-spacing: 0.002em;
+  --text-caption: 0.75rem; /* Caption */
+  --text-caption--line-height: 1rem;
+  --text-caption--letter-spacing: 0.01em;
   --shadow-card: var(--card-shadow);
   --radius-input: 0.5rem; /* v-radius-input */
   --radius-card: 1rem; /* v-radius-card */
   --radius-panel: 1.5rem; /* v-radius-panel */
   --radius-button: 2.25rem; /* v-radius-button */
   --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1); /* wf-ease-out-expo */
-  --animate-rise: rise 0.6s var(--ease-out-expo) both;
+  --animate-rise: rise 0.4s var(--ease-out-expo) both;
   --animate-pulse-dot: pulse-dot 1.2s ease-in-out infinite;
 
   @keyframes rise {
@@ -108,7 +132,6 @@
   body {
     background: var(--surface);
     color: var(--ink);
-    letter-spacing: -0.01em;
   }
 
   :where(a, button, [tabindex], input[type="checkbox"]):focus-visible {
@@ -122,10 +145,38 @@
   }
 }
 
-/* Assistant prose: react-markdown output. */
+/* Side gutter that also clears the notch and rounded corners in landscape (safe areas). */
+.gutter {
+  padding-inline: max(1.25rem, env(safe-area-inset-left)) max(1.25rem, env(safe-area-inset-right));
+}
+
+/* Small uppercase label above a card or section. */
+.eyebrow {
+  font-size: var(--text-caption);
+  line-height: var(--text-caption--line-height);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Inline text links keep their size but get a 44px-tall hit area (HIG minimum). */
+.hit-44 {
+  position: relative;
+}
+.hit-44::after {
+  content: "";
+  position: absolute;
+  inset: 50% -0.25rem auto;
+  height: 2.75rem;
+  transform: translateY(-50%);
+}
+
+/* Assistant prose: react-markdown output, set in the Body style. */
 .chat-prose {
-  font-size: 1rem;
-  line-height: 1.65;
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  letter-spacing: var(--text-body--letter-spacing);
   color: var(--ink-2);
   overflow-wrap: anywhere;
 }
