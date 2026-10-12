@@ -10,13 +10,13 @@ Success is correct, sourced answers and a clean handoff, not broad coverage.
 
 - Next.js 16 App Router (React) + TypeScript on Vercel; Node 22. Next 16 differs from training data: check `node_modules/next/dist/docs/` first (see `AGENTS.md`).
 - LLM: OpenRouter via `@openrouter/ai-sdk-provider` and the Vercel AI SDK. Chat model `anthropic/claude-haiku-5.5` (D5); judge model Sonnet 5.5.
-- Supabase Postgres: `handoffs`, `knowledge_gaps`, `conversation_turns`, `rate_counters`. RLS on, no policies; service role key server-side only.
-- Resend: best-effort handoff notification to the owner inbox. The `handoffs` row is the record.
-- `src/app/api/chat/route.ts`: guards, then `generateReply`, then stream, then logging. No prompt text here.
-- `src/lib/reply.ts`: `generateReply(messages)`. Shared by the route and the eval runner; never fork it.
+- Supabase Postgres: `handoffs`, `knowledge_gaps`, `conversation_turns`, `rate_counters`, `events`. RLS on, no policies; service role key server-side only. Retention by daily cron (D15).
+- Observability is in-app (D17): typed `AppEvent`s (`src/lib/events/`) go to `events` and stream to the Behind the scenes panel. No Resend, no Sentry; the `handoffs` row is the record.
+- `src/app/api/chat/route.ts`: guards, then `generateReply`, then stream with event metadata, then logging. No prompt text here.
+- `src/lib/reply.ts`: `generateReply(messages, ctx)`. Shared by the route and the eval runner; never fork it.
 - `src/lib/prompt/`: `system.md` (bot rules) and `build.ts` (prompt assembly, hash, caching).
-- `src/lib/tools/`: `get_booking_link`, `request_human_followup`, `log_knowledge_gap` (zod schemas).
-- `src/lib/guards/`: input cap, rate limit, spend breaker, link filter, contact provenance.
+- `src/lib/tools/`: `get_booking_link`, `get_page_link`, `show_contact_form`, `request_human_followup`, `log_knowledge_gap` (zod schemas; outputs typed in `ui-types.ts` and rendered as cards).
+- `src/lib/guards/`: input cap, bot check (BotID, D16), rate limit, spend breaker, link filter, contact provenance.
 - `knowledge/*.md`: one topic per file. Frontmatter: `source:`, `verified:`, `industries:`, `services:`. Evidence in `knowledge/_evidence/`. Allowlist in `knowledge/links.md`.
 - `evals/`: `scenarios.yaml`, `rubric.md`, `calibration.yaml`, `results/`.
 
@@ -24,8 +24,9 @@ Success is correct, sourced answers and a clean handoff, not broad coverage.
 
 - `npm run dev` · `npm run build` · `npm run typecheck` · `npm run lint` · `npm test`
 - `npm run eval` (all tiers) · `npm run eval -- --tier 1 --ci` · `npm run eval -- --id <scenario>`
-- `npm run check:kb` (G3) · `npm run check:prompt` (G4) · `npm run gate` (everything CI runs)
-- Env vars are listed in `.env.example`: `OPENROUTER_API_KEY`, `MODEL_ID`, `JUDGE_MODEL_ID`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `HANDOFF_NOTIFY_EMAIL`, `DAILY_SPEND_LIMIT_USD`.
+- `npm run check:kb` (G3) · `npm run check:prompt` (G4) · `npm run check:evals` (G7) · `npm run gate` (everything CI runs)
+- `npm run eval:calibrate` (judge agreement, D6) · `npm run delete-contact -- --email <address>` (deletion requests)
+- Env vars are listed in `.env.example`: `OPENROUTER_API_KEY`, `MODEL_ID`, `JUDGE_MODEL_ID`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `DAILY_SPEND_LIMIT_USD`; Vercel only: `CRON_SECRET`, `SMOKE_TOKEN`.
 
 ## Invariants: the bot
 

@@ -105,6 +105,7 @@ Never cut: G1, G3, the Tier 1 eval gate, G8, the handoff row, honest escalation,
 | 1:05 | Cadre key swap and Resend notify env moved to final QA (D13) | Owner's call; guards verified in production |
 | 2:15 | Runtime price guard parked | Prices are prevented by prompt rules and CI-blocking evals; runtime enforcement deferred |
 | 2:15 | Calibration labels delegated to Claude (D6) | Owner's call; synthetic items labelled by construction |
+| 2:50 | Public `/evals` page replaced by the in-app Behind the scenes panel plus the README eval tables | The panel shows verification live in the product (D17); the cut order allowed a README table instead of `/evals` |
 
 ## Parking lot
 
