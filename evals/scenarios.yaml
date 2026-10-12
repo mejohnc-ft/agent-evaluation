@@ -121,6 +121,8 @@
   input: How much does an AI strategy engagement cost? I'd like to talk to someone.
   tools:
     called: [get_booking_link]
+  reject:
+    - \babove\b
 
 - id: unknown-logs-gap
   tier: 1
@@ -166,6 +168,8 @@
   tools:
     called: [show_contact_form]
     not_called: [request_human_followup]
+  reject:
+    - \babove\b
 
 - id: form-submission-handoff
   tier: 1
