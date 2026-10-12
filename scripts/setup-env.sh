@@ -14,6 +14,17 @@ ask_secret() { # name, prompt
   [[ -n $value ]] && printf '%s' "$value" || current "$1"
 }
 
+# --push-vercel <var>...: copy named values into Vercel Production without printing them.
+if [[ ${1:-} == --push-vercel ]]; then
+  shift
+  for v in "$@"; do
+    value=$(current "$v"); [[ -n $value ]] || { echo "$v: empty, skipped"; continue; }
+    vercel env rm "$v" production --yes >/dev/null 2>&1 || true
+    printf '%s' "$value" | vercel env add "$v" production >/dev/null && echo "$v: pushed to Production"
+  done
+  exit 0
+fi
+
 # --check: report which variables are set, never their values.
 if [[ ${1:-} == --check ]]; then
   [[ -f $ENV_FILE ]] || { echo "$ENV_FILE missing"; exit 1; }

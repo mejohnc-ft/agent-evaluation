@@ -1,0 +1,2 @@
+# G1: refuse commits containing secrets.
+gitleaks protect --staged --redact
