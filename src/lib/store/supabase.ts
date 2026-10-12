@@ -10,11 +10,6 @@ function fail(op: string, error: { message: string } | null): never {
   throw new StoreError(`${op} failed${error ? `: ${error.message}` : ""}`);
 }
 
-function startOfTodayUtc() {
-  const now = new Date();
-  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())).toISOString();
-}
-
 // Env is read here, not at module load, so the build needs no secrets.
 export function createSupabaseStore(): Store {
   const url = process.env.SUPABASE_URL;
@@ -72,10 +67,12 @@ export function createSupabaseStore(): Store {
     },
 
     async spendTodayUsd() {
+      const now = new Date();
+      const startOfTodayUtc = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
       const { data, error } = await db
         .from("conversation_turns")
         .select("cost_usd")
-        .gte("created_at", startOfTodayUtc());
+        .gte("created_at", startOfTodayUtc.toISOString());
       if (error || !data) fail("spendTodayUsd", error);
       // numeric columns arrive as strings or numbers depending on precision.
       return data.reduce((sum, r) => sum + Number(r.cost_usd), 0);

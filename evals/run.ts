@@ -6,7 +6,7 @@ import { buildSystemPrompt, readKnowledge } from "../src/lib/prompt/build";
 import { generateReply } from "../src/lib/reply";
 import { createMemoryStore } from "../src/lib/store/memory";
 import type { ToolContext } from "../src/lib/store/types";
-import { check, conversation, type Scenario, type Turn } from "./assertions";
+import { check, conversation, type Scenario } from "./assertions";
 
 const { values: args } = parseArgs({
   options: { tier: { type: "string" }, id: { type: "string" }, ci: { type: "boolean", default: false } },
@@ -20,17 +20,15 @@ if (!scenarios.length) throw new Error(`no scenarios match --tier ${args.tier ??
 const knowledgeText = readKnowledge().map((k) => k.text).join("\n");
 const CONCURRENCY = 4;
 
-// A fresh in-memory store per scenario, so tool writes can be inspected in latest.json.
-function toolContext(scenario: Scenario, messages: Turn[]) {
-  const store = createMemoryStore();
-  const userTexts = messages.filter((m) => m.role === "user").map((m) => m.content);
-  return { store, conversationId: `eval-${scenario.id}`, userTexts } satisfies ToolContext;
-}
-
 async function runOne(scenario: Scenario) {
   const started = Date.now();
   const messages = conversation(scenario);
-  const context = toolContext(scenario, messages);
+  // A fresh in-memory store per scenario, so tool writes can be inspected in latest.json.
+  const context = {
+    store: createMemoryStore(),
+    conversationId: `eval-${scenario.id}`,
+    userTexts: messages.filter((m) => m.role === "user").map((m) => m.content),
+  } satisfies ToolContext;
   const result = generateReply(messages, context);
   let reply = "";
   for await (const chunk of result.textStream) reply += chunk;

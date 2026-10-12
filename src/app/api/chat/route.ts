@@ -24,8 +24,6 @@ function say(text: string) {
   });
 }
 
-const textOf = (m: UIMessage) => m.parts.map((p) => (p.type === "text" ? p.text : "")).join("");
-
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
   const input = checkInput(body?.messages);
@@ -48,7 +46,9 @@ export async function POST(req: Request) {
   const spend = await checkSpend(store, Number(process.env.DAILY_SPEND_LIMIT_USD ?? 1), console.error);
   if (!spend.ok) return say(spend.message);
 
-  const userTexts = messages.filter((m) => m.role === "user").map(textOf);
+  const userTexts = messages
+    .filter((m) => m.role === "user")
+    .map((m) => m.parts.map((p) => (p.type === "text" ? p.text : "")).join(""));
   const started = Date.now();
   const result = generateReply(await convertToModelMessages(messages), { store, conversationId, userTexts });
 
