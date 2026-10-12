@@ -4,6 +4,7 @@ import yaml from "js-yaml";
 import { modelId } from "../src/lib/llm";
 import { buildSystemPrompt, readKnowledge } from "../src/lib/prompt/build";
 import { generateReply } from "../src/lib/reply";
+import { createEventLog } from "../src/lib/events/log";
 import { createMemoryStore } from "../src/lib/store/memory";
 import type { ToolContext } from "../src/lib/store/types";
 import { costUsd } from "../src/lib/turn-log";
@@ -26,10 +27,13 @@ async function runOne(scenario: Scenario) {
   const started = Date.now();
   const messages = conversation(scenario);
   // A fresh in-memory store per scenario, so tool writes can be inspected in latest.json.
+  const store = createMemoryStore();
+  const log = createEventLog(store, `eval-${scenario.id}`);
   const context = {
-    store: createMemoryStore(),
+    store,
     conversationId: `eval-${scenario.id}`,
     userTexts: messages.filter((m) => m.role === "user").map((m) => m.content),
+    emit: log.emit,
   } satisfies ToolContext;
   const result = generateReply(messages, context);
   let reply = "";
@@ -48,7 +52,7 @@ async function runOne(scenario: Scenario) {
   }
   const mark = failures.length ? "FAIL" : "pass";
   console.log(`${mark}  ${scenario.id}${failures.map((f) => `\n      - ${f}`).join("")}`);
-  const stored = { handoffs: context.store.handoffs, gaps: context.store.gaps };
+  const stored = { handoffs: store.handoffs, gaps: store.gaps, events: store.events };
   return { id: scenario.id, tier: scenario.tier, messages, reply, toolCalls, stored, verdicts, passed: !failures.length, failures, ms, costUsd: cost };
 }
 

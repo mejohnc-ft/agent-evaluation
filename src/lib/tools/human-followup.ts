@@ -1,7 +1,6 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { checkContactProvenance } from "../guards/contact-provenance";
-import { notifyHandoff } from "../notify";
 import type { ToolContext } from "../store/types";
 import type { HandoffOutput } from "./ui-types";
 
@@ -22,10 +21,12 @@ export function requestHumanFollowup(ctx: ToolContext) {
       try {
         const row = { ...input, conversationId: ctx.conversationId };
         const { id } = await ctx.store.insertHandoff(row);
-        await notifyHandoff({ ...row, id });
+        ctx.emit({ type: "handoff_saved", handoffId: id });
         return { ok: true, id };
       } catch (error) {
-        console.error("handoff insert failed", error instanceof Error ? error.message : error);
+        const message = error instanceof Error ? error.message : String(error);
+        console.error("handoff insert failed", message);
+        ctx.emit({ type: "error", where: "handoff", message });
         return { ok: false, error: "The request could not be saved. Give the visitor hello@gocadre.ai instead." };
       }
     },

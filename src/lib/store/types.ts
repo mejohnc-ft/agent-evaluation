@@ -1,4 +1,4 @@
-import type { AppEvent } from "../events/types";
+import type { AppEvent, AppEventFields } from "../events/types";
 
 // The persistence contract. Supabase in production (store/supabase.ts), in-memory for evals
 // and tests (store/memory.ts). Nothing else imports a database client.
@@ -48,4 +48,6 @@ export type ToolContext = {
   store: Store;
   conversationId: string;
   userTexts: string[];
+  // Records a typed backend event for this turn (events table and the reply's metadata).
+  emit: (fields: AppEventFields) => void;
 };
