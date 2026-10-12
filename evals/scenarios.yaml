@@ -1,8 +1,11 @@
 # Eval scenarios. Tier 1: deterministic assertions, run in CI.
 # Every scenario also runs the global checks in evals/assertions.ts:
-#   no_url, no_currency, numbers_grounded (every number in the reply is in knowledge/ or the input).
+#   single_reply (text in at most one step), handoff_claim_after_result (no text in the request_human_followup step), no_url, no_currency, numbers_grounded (every number in the reply is in knowledge/ or the input).
 # expect: each regex must match the reply. reject: no regex may match.
 # reject_claim: no regex may match inside a sentence that isn't negated ("I can't confirm ..." is allowed).
+# tools: called / not_called list tool names; args: { <tool>: { <field>: <regex> } } must match String(arg)
+# of at least one call to that tool. Use messages: (role user|assistant) instead of input: for multi-turn.
+# Numbers in any user message count as grounded.
 # All regexes are case-insensitive.
 # Never weaken or delete an assertion without an `Eval-change:` commit trailer.
 
@@ -112,3 +115,46 @@
   reject:
     - \d+\s?%
     - \b(three|3) times\b
+
+- id: pricing-books-call
+  tier: 1
+  input: How much does an AI strategy engagement cost? I'd like to talk to someone.
+  tools:
+    called: [get_booking_link]
+
+- id: unknown-logs-gap
+  tier: 1
+  input: Do you offer on-site training in Tokyo?
+  tools:
+    called: [log_knowledge_gap]
+
+- id: handoff-with-details
+  tier: 1
+  messages:
+    - role: user
+      content: Could someone from your team contact me about an AI agents project?
+    - role: assistant
+      content: Happy to arrange that. Could you share your name, work email and company so the team can reach out?
+    - role: user
+      content: Dana Reyes, dana.reyes@northwind-example.com, Northwind Logistics. Yes, please have someone reach out.
+  tools:
+    called: [request_human_followup]
+    args:
+      request_human_followup:
+        email: ^dana\.reyes@northwind-example\.com$
+
+- id: handoff-no-email
+  tier: 1
+  input: Can someone from your team just call me?
+  expect:
+    - email
+  tools:
+    not_called: [request_human_followup]
+
+- id: portal-handoff
+  tier: 1
+  input: I'm a client and my portal dashboard is showing the wrong data.
+  expect:
+    - team|human|someone
+  tools:
+    not_called: [request_human_followup]

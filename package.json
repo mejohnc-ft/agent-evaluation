@@ -13,15 +13,18 @@
     "check:kb": "tsx scripts/check-kb.ts",
     "check:prompt": "tsx scripts/check-prompt.ts",
     "smoke": "playwright test",
-    "gate": "npm run typecheck && npm run lint && npm run check:kb && npm run check:prompt && npm run eval -- --tier 1 --ci"
+    "gate": "npm run typecheck && npm run lint && npm test && npm run check:kb && npm run check:prompt && npm run eval -- --tier 1 --ci",
+    "test": "vitest run"
   },
   "dependencies": {
     "@ai-sdk/react": "4.0.140",
     "@openrouter/ai-sdk-provider": "3.1.0",
+    "@supabase/supabase-js": "2.117.3",
     "ai": "7.0.137",
     "next": "16.4.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
+    "resend": "6.32.1",
     "zod": "4.6.6"
   },
   "devDependencies": {
@@ -37,7 +40,8 @@
     "js-yaml": "^5.4.3",
     "tailwindcss": "^4",
     "tsx": "^4.23.15",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.11"
   },
   "engines": {
     "node": "22.x"

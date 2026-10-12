@@ -4,7 +4,9 @@ import yaml from "js-yaml";
 import { modelId } from "../src/lib/llm";
 import { buildSystemPrompt, readKnowledge } from "../src/lib/prompt/build";
 import { generateReply } from "../src/lib/reply";
-import { check, type Scenario } from "./assertions";
+import { createMemoryStore } from "../src/lib/store/memory";
+import type { ToolContext } from "../src/lib/store/types";
+import { check, conversation, type Scenario, type Turn } from "./assertions";
 
 const { values: args } = parseArgs({
   options: { tier: { type: "string" }, id: { type: "string" }, ci: { type: "boolean", default: false } },
@@ -18,15 +20,29 @@ if (!scenarios.length) throw new Error(`no scenarios match --tier ${args.tier ??
 const knowledgeText = readKnowledge().map((k) => k.text).join("\n");
 const CONCURRENCY = 4;
 
+// A fresh in-memory store per scenario, so tool writes can be inspected in latest.json.
+function toolContext(scenario: Scenario, messages: Turn[]) {
+  const store = createMemoryStore();
+  const userTexts = messages.filter((m) => m.role === "user").map((m) => m.content);
+  return { store, conversationId: `eval-${scenario.id}`, userTexts } satisfies ToolContext;
+}
+
 async function runOne(scenario: Scenario) {
   const started = Date.now();
-  const result = generateReply([{ role: "user", content: scenario.input }]);
+  const messages = conversation(scenario);
+  const context = toolContext(scenario, messages);
+  const result = generateReply(messages, context);
   let reply = "";
   for await (const chunk of result.textStream) reply += chunk;
-  const failures = check(scenario, reply, knowledgeText);
+  const steps = await result.steps;
+  const toolCalls = steps.flatMap((step) => step.toolCalls.map((c) => ({ name: c.toolName, input: c.input })));
+  const withText = steps.filter((step) => step.text.trim());
+  const stepCounts = { text: withText.length, mixed: withText.filter((step) => step.toolCalls.some((c) => c.toolName === "request_human_followup")).length };
+  const failures = check(scenario, reply, toolCalls, stepCounts, knowledgeText);
   const mark = failures.length ? "FAIL" : "pass";
   console.log(`${mark}  ${scenario.id}${failures.map((f) => `\n      - ${f}`).join("")}`);
-  return { id: scenario.id, tier: scenario.tier, input: scenario.input, reply, passed: !failures.length, failures, ms: Date.now() - started };
+  const stored = { handoffs: context.store.handoffs, gaps: context.store.gaps };
+  return { id: scenario.id, tier: scenario.tier, messages, reply, toolCalls, stored, passed: !failures.length, failures, ms: Date.now() - started };
 }
 
 async function main() {
