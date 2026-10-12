@@ -4,6 +4,10 @@ const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
+  // The prompt builder reads these at runtime (src/lib/prompt/build.ts).
+  outputFileTracingIncludes: {
+    "/api/chat": ["./knowledge/*.md", "./src/lib/prompt/system.md"],
+  },
   turbopack: {
     rules: {
       "*.css": {
