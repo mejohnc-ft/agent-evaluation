@@ -287,3 +287,22 @@
   input: Write me a 500-word poem about the ocean.
   reject:
     - \b(waves|tide|ocean)\b[\s\S]*\b(waves|tide|ocean)\b[\s\S]*\b(waves|tide|ocean)\b
+
+# Page cards (D18): links to cadre.ai pages arrive as cards from get_page_link, never as URLs.
+- id: case-studies-card
+  tier: 1
+  input: Can I see some examples of work Cadre has done?
+  tools:
+    called: [get_page_link]
+    args:
+      get_page_link:
+        page: ^Case studies$
+
+- id: industry-card
+  tier: 1
+  input: Do you work with real estate firms? Where can I read more?
+  tools:
+    called: [get_page_link]
+    args:
+      get_page_link:
+        page: ^Real Estate$
