@@ -2,14 +2,16 @@ import { readKnowledge } from "./prompt/build";
 
 let cached: Map<string, string> | undefined;
 
-// One line describing a cadre.ai page, from the knowledge file whose `source:` is that page:
-// the first line of body text, its first sentence, clipped. Only knowledge-base words reach the card.
+// One line describing a cadre.ai page, from the knowledge file whose `source:` is that page: its
+// `summary:` frontmatter when present, otherwise the first sentence of the body. Only knowledge-base
+// words reach the card.
 export function pageSummary(url: string): string {
   cached ??= new Map(
     readKnowledge().flatMap(({ text }) => {
       const source = text.match(/^source:\s*(\S+)/m)?.[1];
       const body = text.split(/^# .*$/m)[1] ?? "";
-      const line = body.split("\n").map((l) => l.replace(/^- /, "").trim()).find(Boolean);
+      const summary = text.match(/^summary:\s*(.+)$/m)?.[1];
+      const line = summary ?? body.split("\n").map((l) => l.replace(/^- /, "").trim()).find(Boolean);
       return source && line ? [[source, firstSentence(line)] as const] : [];
     }),
   );

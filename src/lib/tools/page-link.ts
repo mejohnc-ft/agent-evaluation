@@ -7,7 +7,6 @@ import type { PageLinkOutput } from "./ui-types";
 // links.md labels a visitor can be pointed to as a card (D18). Contact and the AI Maturity Index
 // go through get_booking_link, which carries their call to action.
 export const PAGE_LABELS = [
-  "Cadre home",
   "About Cadre",
   "Case studies",
   "Privacy policy",

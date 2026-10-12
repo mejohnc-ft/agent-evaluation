@@ -13,7 +13,8 @@ export function parseSource(file: string, text: string): KnowledgeSource | null 
   const url = field("source");
   const verified = field("verified");
   const title = /^# (.+?)\s*$/m.exec(text.slice(front.length))?.[1];
-  return url && verified && title ? { file, title, url, verified } : null;
+  // Headings carry a "(industry)" qualifier for the model; visitors see the page name.
+  return url && verified && title ? { file, title: title.replace(/\s*\(industry\)$/, ""), url, verified } : null;
 }
 
 // Knowledge only changes with a deploy, so the list is built once and cached for the long term.

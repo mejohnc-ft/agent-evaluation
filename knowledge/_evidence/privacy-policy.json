@@ -1,15 +1,72 @@
 [
-{"claim": "The privacy policy was last updated 09/01/2026.", "url": "https://cadre.ai/legal/privacy-policy", "snippet": "Last updated: 09/01/2026"},
-{"claim": "The company legal name is AI Gurus LLC dba Cadre AI.", "url": "https://cadre.ai/legal/privacy-policy", "snippet": "Company Legal Name: AI Gurus LLC dba Cadre AI"},
-{"claim": "Registered address: 3580 Carmel Mountain Rd #150, San Diego, CA 92130, USA.", "url": "https://cadre.ai/legal/privacy-policy", "snippet": "Registered Address: 3580 Carmel Mountain Rd #150, San Diego, CA 92130, USA"},
-{"claim": "Contact email for privacy questions is privacy@gocadre.ai.", "url": "https://cadre.ai/legal/privacy-policy", "snippet": "Contact Email: privacy@gocadre.ai"},
-{"claim": "Company phone number is +1 (619) 324-3223.", "url": "https://cadre.ai/legal/privacy-policy", "snippet": "Company Phone Number: +1 (619) 324-3223"},
-{"claim": "The policy covers the cadre.ai website and the services of the company.", "url": "https://cadre.ai/legal/privacy-policy", "snippet": "collects, uses, shares, and protects personal information about you when you visit or interact with https://cadre.ai"},
-{"claim": "Information listed as provided directly includes identifiers (name, email, phone, IP address).", "url": "https://cadre.ai/legal/privacy-policy", "snippet": "Identifiers (name, email, phone, IP address)"},
-{"claim": "The policy says information provided may include payment information.", "url": "https://cadre.ai/legal/privacy-policy", "snippet": "payment information, and any other information you choose to provide"},
-{"claim": "Information collected automatically may include cookies, usage data, device and browser information, and location.", "url": "https://cadre.ai/legal/privacy-policy", "snippet": "Device and browser information"},
-{"claim": "Information is used for analytics and product improvement, marketing and advertising, and legal compliance.", "url": "https://cadre.ai/legal/privacy-policy", "snippet": "We use the information we collect for the following purposes:"},
-{"claim": "The company says it does not intentionally collect special category data, and asks visitors not to submit it.", "url": "https://cadre.ai/legal/privacy-policy", "snippet": "We do not intentionally collect special category data"},
-{"claim": "Data retention: the policy says it retains data for 2 years in practice.", "url": "https://cadre.ai/legal/privacy-policy", "snippet": "In practice, this means we retain your data for 2 years."},
-{"claim": "Visitors may have rights to access, correct, delete, or restrict the use of their data, depending on location.", "url": "https://cadre.ai/legal/privacy-policy", "snippet": "the right to access, correct, delete, or restrict the use of your data"}
+  {
+    "claim": "The privacy policy was last updated 09/01/2026.",
+    "url": "https://cadre.ai/legal/privacy-policy",
+    "snippet": "Last updated: 09/01/2026"
+  },
+  {
+    "claim": "The company legal name is AI Gurus LLC dba Cadre AI.",
+    "url": "https://cadre.ai/legal/privacy-policy",
+    "snippet": "Company Legal Name: AI Gurus LLC dba Cadre AI"
+  },
+  {
+    "claim": "Registered address: 3580 Carmel Mountain Rd #150, San Diego, CA 92130, USA.",
+    "url": "https://cadre.ai/legal/privacy-policy",
+    "snippet": "Registered Address: 3580 Carmel Mountain Rd #150, San Diego, CA 92130, USA"
+  },
+  {
+    "claim": "Contact email for privacy questions is privacy@gocadre.ai.",
+    "url": "https://cadre.ai/legal/privacy-policy",
+    "snippet": "Contact Email: privacy@gocadre.ai"
+  },
+  {
+    "claim": "Company phone number is +1 (619) 324-3223.",
+    "url": "https://cadre.ai/legal/privacy-policy",
+    "snippet": "Company Phone Number: +1 (619) 324-3223"
+  },
+  {
+    "claim": "The policy covers the cadre.ai website and the services of the company.",
+    "url": "https://cadre.ai/legal/privacy-policy",
+    "snippet": "collects, uses, shares, and protects personal information about you when you visit or interact with https://cadre.ai"
+  },
+  {
+    "claim": "Information listed as provided directly includes identifiers (name, email, phone, IP address).",
+    "url": "https://cadre.ai/legal/privacy-policy",
+    "snippet": "Identifiers (name, email, phone, IP address)"
+  },
+  {
+    "claim": "The policy says information provided may include payment information.",
+    "url": "https://cadre.ai/legal/privacy-policy",
+    "snippet": "payment information, and any other information you choose to provide"
+  },
+  {
+    "claim": "Information collected automatically may include cookies, usage data, device and browser information, and location.",
+    "url": "https://cadre.ai/legal/privacy-policy",
+    "snippet": "Device and browser information"
+  },
+  {
+    "claim": "Information is used for analytics and product improvement, marketing and advertising, and legal compliance.",
+    "url": "https://cadre.ai/legal/privacy-policy",
+    "snippet": "We use the information we collect for the following purposes:"
+  },
+  {
+    "claim": "The company says it does not intentionally collect special category data, and asks visitors not to submit it.",
+    "url": "https://cadre.ai/legal/privacy-policy",
+    "snippet": "We do not intentionally collect special category data"
+  },
+  {
+    "claim": "Data retention: the policy says it retains data for 2 years in practice.",
+    "url": "https://cadre.ai/legal/privacy-policy",
+    "snippet": "In practice, this means we retain your data for 2 years."
+  },
+  {
+    "claim": "Visitors may have rights to access, correct, delete, or restrict the use of their data, depending on location.",
+    "url": "https://cadre.ai/legal/privacy-policy",
+    "snippet": "the right to access, correct, delete, or restrict the use of your data"
+  },
+  {
+    "claim": "Summary: the privacy policy for the cadre.ai website and Cadre AI's services.",
+    "url": "https://cadre.ai/legal/privacy-policy",
+    "snippet": "collects, uses, shares, and protects personal information about you when you visit or interact with https://cadre.ai"
+  }
 ]

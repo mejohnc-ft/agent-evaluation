@@ -112,6 +112,7 @@ source: https://cadre.ai/case-studies
 verified: 2026-10-12
 industries: []
 services: []
+summary: Client results with hours and costs saved, each listed as a Non-Disclosed Company.
 ---
 # Case studies
 
@@ -351,6 +352,7 @@ source: https://cadre.ai/legal/privacy-policy
 verified: 2026-10-12
 industries: []
 services: []
+summary: The privacy policy for the cadre.ai website and Cadre AI's services.
 ---
 # Privacy policy
 
