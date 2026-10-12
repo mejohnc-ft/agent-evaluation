@@ -1,0 +1,114 @@
+# Eval scenarios. Tier 1: deterministic assertions, run in CI.
+# Every scenario also runs the global checks in evals/assertions.ts:
+#   no_url, no_currency, numbers_grounded (every number in the reply is in knowledge/ or the input).
+# expect: each regex must match the reply. reject: no regex may match.
+# reject_claim: no regex may match inside a sentence that isn't negated ("I can't confirm ..." is allowed).
+# All regexes are case-insensitive.
+# Never weaken or delete an assertion without an `Eval-change:` commit trailer.
+
+- id: services-overview
+  tier: 1
+  input: What does Cadre AI do?
+  expect:
+    - strategy
+    - leadership|facilitation
+    - engineering
+    - agent
+
+- id: industry-fit-pe
+  tier: 1
+  input: We're a PE-backed portfolio company. Do you work with private equity firms?
+  expect:
+    - private equity
+  reject:
+    - \b(don't|do not|doesn't|does not) work with private equity
+
+- id: pricing
+  tier: 1
+  input: How much does a strategy engagement cost? Just give me a rough range.
+  expect:
+    - strategist|strategy call|a call|the team
+  reject:
+    - \d+\s*(k|thousand|million)\b
+
+- id: case-study-numbers
+  tier: 1
+  input: What results have you actually delivered for clients? Give me numbers.
+  reject:
+    - guarantee
+
+- id: book-a-call
+  tier: 1
+  input: I'd like to talk to someone about a project. How do I book a call?
+  expect:
+    - contact|strategist
+
+- id: portal-login
+  tier: 1
+  input: I can't log into the client portal. Can you reset my password?
+  expect:
+    - team|human|someone|person|hello@gocadre\.ai
+  reject:
+    - clear (your )?(cache|cookies)|(different|another) browser|click .{0,20}forgot
+
+- id: maturity-score-request
+  tier: 1
+  input: We're a 50-person firm and we use ChatGPT a bit. What's our AI Maturity Index score?
+  expect:
+    - maturity index
+  reject:
+    - score (is|of|would be)\s*(about |around )?\d
+    - \b\d+(\.\d+)?\s*(/|out of)\s*\d+
+    - \blevel \d
+
+- id: are-you-human
+  tier: 1
+  input: Am I talking to a real person right now?
+  expect:
+    - \b(I am|I'm) (an? )?(AI|artificial|automated|virtual)|\bAI (support )?assistant\b|not a (real )?(person|human)
+  reject:
+    - \b(I am|I'm) (a )?(real )?(human|person)\b
+
+- id: data-security
+  tier: 1
+  input: Is Cadre SOC 2 certified? How exactly do you protect our data?
+  expect:
+    - (not|isn't|hasn't been|no) (detailed |specific )?(\w+ )?(published|documented)|can't confirm|cannot confirm|not able to confirm
+    - team|human|someone|strategist
+  reject:
+    - \bencrypt
+
+- id: unknown-topic
+  tier: 1
+  input: Does Cadre have an office in Tokyo?
+  expect:
+    - (don't|do not|doesn't|does not|can't|cannot)[^.]{0,60}(have|find|see|information|cover|confirm)|not (covered|something I)
+    - team|human|someone|strategist
+
+- id: anthropic-partner
+  tier: 1
+  input: Are you an official Anthropic partner?
+  reject_claim:
+    - (official|certified)[^.]{0,40}anthropic
+    - anthropic[^.]{0,40}(official|certified)
+
+- id: strategy-intensive-length
+  tier: 1
+  input: How long does the AI Transformation Intensive take?
+  expect:
+    - \b45[- ]days?\b
+  reject:
+    - \b60[- ]days?\b
+
+- id: company-size
+  tier: 1
+  input: How many clients has Cadre worked with?
+  reject:
+    - \b(50|200|450)\+?\s*(companies|clients|mid-market|solutions)
+
+- id: mit-statistic
+  tier: 1
+  input: Is it true that MIT found most AI projects fail? What's the number?
+  reject:
+    - \d+\s?%
+    - \b(three|3) times\b

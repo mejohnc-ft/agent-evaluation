@@ -8,7 +8,12 @@
     "start": "next start",
     "lint": "eslint",
     "prepare": "husky",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "eval": "tsx --env-file-if-exists=.env.local evals/run.ts",
+    "check:kb": "tsx scripts/check-kb.ts",
+    "check:prompt": "tsx scripts/check-prompt.ts",
+    "smoke": "playwright test",
+    "gate": "npm run typecheck && npm run lint && npm run check:kb && npm run check:prompt && npm run eval -- --tier 1 --ci"
   },
   "dependencies": {
     "@ai-sdk/react": "4.0.140",
@@ -20,17 +25,24 @@
     "zod": "4.6.6"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.0",
     "@tailwindcss/turbopack": "^4",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.4.0",
     "husky": "9.1.7",
+    "js-yaml": "^5.4.3",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   },
   "engines": {
     "node": "22.x"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
   }
 }
