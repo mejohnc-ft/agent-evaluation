@@ -88,14 +88,14 @@ Never cut: G1, G3, the Tier 1 eval gate, G8, the handoff row, honest escalation,
 - **I need:** reviewers can see verification without reading code.
 - **You get:** public `/evals` page; next-step card only if ahead.
 - **Done looks like:** `/evals` live and linked from chat; tag `freeze`.
-- [ ] Status · Actual time: · Notes:
+- [x] Status · Actual time: 2026-10-12 11:50–12:30 · Notes: Scope changed (see Scope changes, 2:50): instead of a public `/evals` page, the product shows its own verification. The header gained new chat and a System/Light/Dark theme; a non-modal Behind the scenes panel shows each turn's typed events (guards, tools, handoffs, gaps, cost) and the 21 knowledge sources; cadre.ai pages arrive as page cards from `get_page_link` (D18). Typed `AppEvent` log in `events` (D17); Resend removed, no Sentry. Tier 2 brought from 89% to 30/30 over five runs (temperature 0, page-description rules, `phantom_card`). `main` now requires the `ci` check. Production QA in real Chrome: grounded answer, page card, contact form, panel Activity and Sources, theme toggle, no console errors; events rows confirmed.
 
 ## Wrap (6:30–7:30)
 
 - **I need:** a submission that tells the story and passes its own checks.
 - **You get:** README, prompts log, known issues, verified zip.
 - **Done looks like:** G10 zip check passes; demo rehearsed; submitted a business day early.
-- [ ] Status · Actual time: · Notes:
+- [x] Status · Actual time: 2026-10-12 12:20–12:35 · Notes: README, `docs/prompts.md` (18 entries, each citing its commit), brief and path-to-production assumptions filled (marked for Cadre to confirm), CLAUDE.md current. G10 is `scripts/check-submission.sh`: proven failing (plan.md removed in a throwaway clone) and passing (86 commits, gitleaks clean on history and files, no env files, 2 MB). Remaining for the owner: Cadre key swap in Vercel Production (D13) and a demo rehearsal.
 
 ## Scope changes
 
@@ -105,6 +105,7 @@ Never cut: G1, G3, the Tier 1 eval gate, G8, the handoff row, honest escalation,
 | 1:05 | Cadre key swap and Resend notify env moved to final QA (D13) | Owner's call; guards verified in production |
 | 2:15 | Runtime price guard parked | Prices are prevented by prompt rules and CI-blocking evals; runtime enforcement deferred |
 | 2:15 | Calibration labels delegated to Claude (D6) | Owner's call; synthetic items labelled by construction |
+| 2:50 | Public `/evals` page replaced by the in-app Behind the scenes panel plus the README eval tables | The panel shows verification live in the product (D17); the cut order allowed a README table instead of `/evals` |
 
 ## Parking lot
 

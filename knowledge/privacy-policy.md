@@ -3,6 +3,7 @@ source: https://cadre.ai/legal/privacy-policy
 verified: 2026-10-12
 industries: []
 services: []
+summary: The privacy policy for the cadre.ai website and Cadre AI's services.
 ---
 # Privacy policy
 

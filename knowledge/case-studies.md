@@ -3,6 +3,7 @@ source: https://cadre.ai/case-studies
 verified: 2026-10-12
 industries: []
 services: []
+summary: Client results with hours and costs saved, each listed as a Non-Disclosed Company.
 ---
 # Case studies
 

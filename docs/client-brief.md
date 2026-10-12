@@ -11,7 +11,9 @@ could answer, while high-value conversations wait.
 The assistant answers common questions from Cadre's published content, qualifies intent, and
 hands real opportunities and account issues to a human with context attached.
 
-TODO(you): one sentence on what changes for the inbound team if this works.
+If it works, the inbound team stops answering questions the site already answers and starts each
+conversation from a handoff that says who the visitor is and what they need. (Assumption for
+Cadre to confirm.)
 
 ## Users and intents
 
@@ -22,7 +24,9 @@ TODO(you): one sentence on what changes for the inbound team if this works.
 | Business leader exploring | AI Maturity Index; LLM selection; data security | Future pipeline | Educate, link to the Maturity Index | Security or compliance specifics not published |
 | Other (careers, press, vendors, partners) | Jobs, interviews, partnerships | Low | Redirect to the right page | Immediately |
 
-TODO(you): rank these by expected volume. Ask Cadre for real inbound mix if possible.
+Assumed volume, highest first: prospects, business leaders exploring, existing clients, other.
+This is a guess from the site's structure (most pages sell services or the Maturity Index), not
+data. Cadre's real inbound mix replaces it.
 
 ## Success metrics
 
@@ -30,11 +34,11 @@ Definitions are measurable from `conversation_turns`, `handoffs` and `knowledge_
 
 | Metric | Definition | Target | Measured by |
 | --- | --- | --- | --- |
-| Self-serve resolution | Conversations ending without a handoff or gap log | TODO(you): e.g. 60% | Logging query |
-| Qualified handoffs | Handoffs with name, email, company and a usable summary | TODO(you): per week | `handoffs` |
+| Self-serve resolution | Conversations ending without a handoff or gap log | 60% (assumption; revisit after two weeks of traffic) | Logging query |
+| Qualified handoffs | Handoffs with name, email, company and a usable summary | Weekly number to set after two weeks of traffic; meanwhile every handoff has all four | `handoffs` |
 | Answer correctness | Tier 2 judge pass rate on the eval suite | 90% or better | `npm run eval` |
 | Unsafe answers | Invented prices, URLs, or human impersonation | 0 | Tier 1 assertions, runtime link filter |
-| Knowledge coverage | Gap entries per 100 conversations, trending down | TODO(you) | `knowledge_gaps` |
+| Knowledge coverage | Gap entries per 100 conversations, trending down | Baseline from the first two weeks, then lower each month (assumption) | `knowledge_gaps` |
 | Cost | Dollars per conversation | Under $0.01 | Logged OpenRouter cost |
 
 ## Non-goals (this build)
@@ -61,7 +65,9 @@ Each assumption is encoded somewhere specific, so a different answer from Cadre 
 | Q8 | Canonical domain? | cadre.ai (brief says cadreai.com; live site is cadre.ai) | Broken links | `knowledge/links.md`, G3 |
 | Q9 | Is "Talk to an AI Strategist" (the /contact form) the right booking route, or is there a scheduler? | /contact form; no calendar link exists on the site | Bot sends visitors to a form when Cadre expects a calendar | `get_booking_link`, `links.md` |
 
-TODO(you): pick the one or two questions worth sending to the recruiter before you build.
+Send first: Q1 and Q4. Q1 sets the promise the bot makes on every handoff, and Q4 decides whether
+the most common prospect question gets any answer beyond a call. The others have safe defaults
+that are small changes if wrong. (Assumption: the recruiter can relay both.)
 
 ## Risks
 
@@ -82,4 +88,7 @@ folder, an allowlist, tools defined once, deterministic guardrails, a tiered eva
 gates that keep them honest. Cadre could reuse them for any client's support assistant.
 Swapping the knowledge folder, links and tool backends is the per-client work.
 
-TODO(you): one sentence on how you'd package this for a Cadre engagement (template repo, playbook, both).
+Packaging (assumption): both. A template repo with the code, gates and eval harness and an empty
+`knowledge/` and `links.md`, plus a short playbook for the per-client work: pre-read the client's
+site for traps, draft and review the knowledge base, write Tier 1 scenarios first, calibrate the
+judge, then roll out in the three stages in path-to-production.md.
