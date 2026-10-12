@@ -1,0 +1,40 @@
+# CI: typecheck, lint, tests, G3, G4 and the G6 Tier 1 eval gate. A Tier 1 failure blocks merge.
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Route types such as LayoutProps are generated; a clean checkout has none.
+      - run: npx next typegen
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test --if-present
+      - run: npm run check:kb
+      - run: npm run check:prompt
+      - name: Tier 1 evals
+        run: npm run eval -- --tier 1 --ci
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          MODEL_ID: ${{ secrets.MODEL_ID }}
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: eval-results
+          path: evals/results/latest.json
+          if-no-files-found: ignore
