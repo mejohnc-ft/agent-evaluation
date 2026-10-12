@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { contactFormMessage } from "@/lib/tools/ui-types";
 import { contactSummary } from "./message-text";
-import { parseBookingLink, parseContactForm, parseHandoff } from "./tool-outputs";
+import { parseBookingLink, parseContactForm, parseHandoff, parsePageLink } from "./tool-outputs";
 
 const link = { purpose: "strategy_call", label: "Contact Cadre", url: "https://cadre.ai/contact", cta: "Talk" };
 
@@ -33,6 +33,29 @@ describe("tool output parsing", () => {
   it("parses the contact form output", () => {
     expect(parseContactForm({ form: "contact", intent: "sales", reason: "Pricing" })).not.toBeNull();
     expect(parseContactForm({ form: "other", intent: "sales", reason: "x" })).toBeNull();
+  });
+});
+
+describe("page link parsing", () => {
+  const page = { label: "AI Strategy", url: "https://cadre.ai/strategy", description: "How the 45-day intensive works." };
+
+  it("accepts a page on an allowed host", () => {
+    expect(parsePageLink(page)).toEqual(page);
+    expect(parsePageLink({ ...page, url: "https://portal.gocadre.ai/assess" })).not.toBeNull();
+  });
+
+  it("rejects other hosts and lookalikes", () => {
+    for (const url of ["https://evil.com/", "http://cadre.ai/strategy", "https://cadre.ai.evil.com/x", "//cadre.ai/x", "javascript:alert(1)"]) {
+      expect(parsePageLink({ ...page, url })).toBeNull();
+    }
+  });
+
+  it("rejects malformed shapes", () => {
+    expect(parsePageLink({ ...page, label: "" })).toBeNull();
+    expect(parsePageLink({ ...page, description: 3 })).toBeNull();
+    expect(parsePageLink({ label: page.label, url: page.url })).toBeNull();
+    expect(parsePageLink("https://cadre.ai/")).toBeNull();
+    expect(parsePageLink(undefined)).toBeNull();
   });
 });
 

@@ -3,7 +3,8 @@ import type { ContactFormFields } from "@/lib/tools/ui-types";
 import { ContactFormCard } from "./contact-form-card";
 import { HandoffCard } from "./handoff-card";
 import { NextStepCard } from "./next-step-card";
-import { parseBookingLink, parseContactForm, parseHandoff } from "./tool-outputs";
+import { PageCard } from "./page-card";
+import { parseBookingLink, parseContactForm, parseHandoff, parsePageLink } from "./tool-outputs";
 
 type Part = UIMessage["parts"][number];
 
@@ -23,6 +24,10 @@ export function ToolCard({ part, ctx }: { part: Part; ctx: ToolCardContext }) {
     case "tool-get_booking_link": {
       const link = parseBookingLink(output);
       return link && <NextStepCard link={link} />;
+    }
+    case "tool-get_page_link": {
+      const page = parsePageLink(output);
+      return page && <PageCard page={page} />;
     }
     case "tool-show_contact_form": {
       const form = parseContactForm(output);

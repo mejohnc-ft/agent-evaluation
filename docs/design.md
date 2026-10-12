@@ -5,8 +5,8 @@ Reference for the chat UI. Source of truth is `src/app/globals.css` (tokens, typ
 
 ## Tokens
 
-Colours are CSS variables on `:root`, swapped under `prefers-color-scheme: dark`, and exposed to
-Tailwind via `@theme inline` (`bg-surface`, `text-ink`, `border-hairline`, ...). Light values come
+Colours are CSS variables on `:root`, swapped under `prefers-color-scheme: dark` (unless the
+visitor picked light) or `:root[data-theme="dark"]`, and exposed to Tailwind via `@theme inline` (`bg-surface`, `text-ink`, `border-hairline`, ...). Light values come
 from cadre.ai's production CSS; dark values are our own.
 
 | Token | Light | Dark | cadre.ai source / note |
@@ -33,6 +33,7 @@ from cadre.ai's production CSS; dark values are our own.
 | `rounded-card` | 1rem (16 px) | `--v-radius-card` |
 | `rounded-panel` | 1.5rem (24 px) | `--v-radius-panel` |
 | `rounded-button` | 2.25rem (pill) | `--v-radius-button` |
+| `shadow-sheet` | `0 -12px 32px #0000000f, 0 -1px 2px #0000000a` (dark: inset highlight + deeper lift) | ours: the bottom sheet lifts upward |
 | `shadow-card` | `0 28px 32px #00000008, 0 1px 2px #0000000a` (dark: inset top highlight + deeper drop) | `--v-shadow-card` plus a lift |
 | `ease-out-expo` | `cubic-bezier(0.19, 1, 0.22, 1)` | `--wf-ease-out-expo` |
 
@@ -66,7 +67,9 @@ Inputs use `body` (16 px) on phones so iOS Safari doesn't zoom on focus.
 | Between turns | 32 px | `MessageList` (`gap-8`) |
 | Reply to card | 20 px | `AssistantMessage` (`gap-5`) |
 | Eyebrow to content | 12 px | `Card` (`mb-3`) |
-| Column | 42rem max | header, conversation, composer |
+| Column | 42rem max | conversation, composer |
+| Header | full width, wordmark left, three 44 px icon buttons right | `SiteHeader` |
+| Side panel | 22rem right column from 1024 px; bottom sheet (60dvh max) below | `SidePanel` |
 | Side gutter | 20 px or the safe-area inset, whichever is larger | `.gutter` |
 
 ## Interaction
@@ -104,13 +107,39 @@ Anatomy (`Card` in `card.tsx`): `section` with hairline border, `rounded-card`, 
 | `NextStepCard` | `get_booking_link` | a strategy call or AI Maturity Index link is offered; URL must match the allowlisted prefixes |
 | `ContactFormCard` | `show_contact_form` | the visitor needs a human; collapses to "Details sent" once submitted |
 | `HandoffCard` | `request_human_followup` | confirms only when `ok === true` (row written); otherwise an `alert` tone card with the fallback email |
+| `PageCard` | `get_page_link` | a cadre.ai page backs the answer; quieter than a card (no shadow, no button): the whole card is one link, eyebrow "From cadre.ai", title, description, host, arrow; allowlisted URL only |
 | (none) | `log_knowledge_gap` | never rendered |
+
+## Header and "Behind the scenes" panel
+
+- **Header controls** (`IconButton`): 44 px round icon buttons with an `aria-label` and a visible
+  tooltip (caption on `ink-fill`) on hover and keyboard focus; the tooltip is `aria-hidden` because
+  it repeats the label. Pointer presses don't take focus (`mousedown` is prevented), so the composer
+  keeps it. New chat starts a fresh `useChat` id (disabled while a reply streams; no confirm).
+  Theme cycles System → Light → Dark: the icon shows the current theme, the label names the next.
+- **Panel** (`SidePanel`): a non-modal `aside`. Opening it never moves focus and nothing is
+  trapped; Esc closes it while focus is inside and hands focus back to the toggle
+  (`aria-expanded`, `aria-controls`). From 1024 px it is a fixed 22rem right column below the
+  header and the page reserves that width, so the chat recentres in the rest. Below 1024 px it is
+  a bottom sheet in the sticky footer, directly above the composer, so typing keeps working:
+  `rounded-panel` top corners, hairline top border, `shadow-sheet`, scrolls inside.
+- **Tabs** (`Tabs`): WAI-ARIA tabs with automatic activation (arrows, Home, End; roving tabindex),
+  footnote text with a 2 px `ink` underline for the selected tab.
+- **Activity**: each assistant message's `metadata.events` is parsed against the `AppEvent`
+  schema (`activity-events.ts`); unknown or malformed events are skipped. Replies are grouped
+  newest first, events within a reply in the order they happened. Rows are footnote text in plain
+  language with the raw event type as a small mono caption badge; `error` rows use `accent-ink`.
+- **Sources**: fetched once from `/api/sources` (built from `knowledge/*.md` frontmatter, cached)
+  the first time the tab opens, validated, allowlisted hosts only. Compact link rows: title,
+  host, "Verified 12 Oct 2026". Loading and error (with retry) states.
 
 ## Dark mode, motion, safe areas
 
-- **Dark mode** follows the OS (`prefers-color-scheme`); there is no toggle. Every colour goes
-  through a token, so components need no `dark:` variants. `themeColor` in `layout.tsx` matches
-  `surface` in each scheme.
+- **Theme** follows the OS by default. The header toggle stores `light` or `dark` in
+  localStorage (every access in `try`/`catch`) and sets `data-theme` on `<html>`; System removes
+  it. An inline script in `layout.tsx` applies the stored choice before first paint, so there is
+  no flash. Every colour goes through a token, so components need no `dark:` variants.
+  `themeColor` in `layout.tsx` follows the OS scheme only.
 - **Motion.** New messages, cards and the empty state use `animate-rise`: 0.4 s, `ease-out-expo`,
   opacity 0 to 1 and 6 px up. Hovers use 300 ms `ease-out-expo` transitions. The typing indicator
   pulses at 1.2 s. Under `prefers-reduced-motion: reduce`, all animations and transitions drop to
@@ -131,4 +160,5 @@ Anatomy (`Card` in `card.tsx`): `section` with hairline border, `rounded-card`, 
   renders nothing on mismatch.
 - Entrances use `animate-rise`; transitions use `ease-out-expo`. Check reduced motion.
 - Decorative icons come from `icons.tsx` (`aria-hidden`); interactive icons need a label.
-- Check light and dark, a 375 px viewport, and keyboard focus before calling it done.
+- Check light and dark (both via the toggle), a 360 px viewport, the panel open and closed, and
+  keyboard focus before calling it done.
