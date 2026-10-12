@@ -184,6 +184,7 @@ services: []
 - Office hours are Monday to Friday, 8:00 AM to 6:00 PM.
 - The support email is hello@gocadre.ai and the phone number is (619) 324-3223.
 - To start, send a message with the contact form to talk to an AI Strategist.
+- The contact page's call to action is labelled "Talk to an AI Strategist".
 - The contact page says: If you'd like a baseline first, the AI Maturity Index scores your company across our eight-pillar framework for AI transformation.
 - Privacy questions go to privacy@gocadre.ai, per the privacy policy.
 </knowledge>

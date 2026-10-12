@@ -1,8 +1,37 @@
 [
-{"claim": "Cadre AI's office is at 3580 Carmel Mountain Rd #150, San Diego, CA 92130.", "url": "https://cadre.ai/contact", "snippet": "Our office is at 3580 Carmel Mountain Rd #150, San Diego, CA 92130."},
-{"claim": "Office hours are Monday to Friday, 8:00 AM to 6:00 PM.", "url": "https://cadre.ai/contact", "snippet": "Monday to Friday, 8:00 AM to 6:00 PM."},
-{"claim": "The support email is hello@gocadre.ai and the phone number is (619) 324-3223.", "url": "https://cadre.ai/contact", "snippet": "Email hello@gocadre.ai or call (619) 324-3223."},
-{"claim": "To start, send a message with the contact form to talk to an AI Strategist.", "url": "https://cadre.ai/contact", "snippet": "Send us a message with the form above to talk to an AI Strategist."},
-{"claim": "The contact page says: If you'd like a baseline first, the AI Maturity Index scores your company across our eight-pillar framework for AI transformation.", "url": "https://cadre.ai/contact", "snippet": "If you'd like a baseline first, the AI Maturity Index scores your company across our eight-pillar framework for AI transformation."},
-{"claim": "Privacy questions go to privacy@gocadre.ai, per the privacy policy.", "url": "https://cadre.ai/legal/privacy-policy", "snippet": "Contact Email: privacy@gocadre.ai"}
+  {
+    "claim": "Cadre AI's office is at 3580 Carmel Mountain Rd #150, San Diego, CA 92130.",
+    "url": "https://cadre.ai/contact",
+    "snippet": "Our office is at 3580 Carmel Mountain Rd #150, San Diego, CA 92130."
+  },
+  {
+    "claim": "Office hours are Monday to Friday, 8:00 AM to 6:00 PM.",
+    "url": "https://cadre.ai/contact",
+    "snippet": "Monday to Friday, 8:00 AM to 6:00 PM."
+  },
+  {
+    "claim": "The support email is hello@gocadre.ai and the phone number is (619) 324-3223.",
+    "url": "https://cadre.ai/contact",
+    "snippet": "Email hello@gocadre.ai or call (619) 324-3223."
+  },
+  {
+    "claim": "To start, send a message with the contact form to talk to an AI Strategist.",
+    "url": "https://cadre.ai/contact",
+    "snippet": "Send us a message with the form above to talk to an AI Strategist."
+  },
+  {
+    "claim": "The contact page says: If you'd like a baseline first, the AI Maturity Index scores your company across our eight-pillar framework for AI transformation.",
+    "url": "https://cadre.ai/contact",
+    "snippet": "If you'd like a baseline first, the AI Maturity Index scores your company across our eight-pillar framework for AI transformation."
+  },
+  {
+    "claim": "Privacy questions go to privacy@gocadre.ai, per the privacy policy.",
+    "url": "https://cadre.ai/legal/privacy-policy",
+    "snippet": "Contact Email: privacy@gocadre.ai"
+  },
+  {
+    "claim": "The contact page's call to action is labelled \"Talk to an AI Strategist\".",
+    "url": "https://cadre.ai/contact",
+    "snippet": "Talk to an AI Strategist"
+  }
 ]
