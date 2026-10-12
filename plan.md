@@ -28,7 +28,7 @@ Each gate is a mechanical check, proven once by making it fail. Commits that add
 | G5 | Guard unit tests written from `docs/guards.md` failure modes | Vitest, CI | Tests fail before the guard exists | 2 |
 | G6 | Eval suite: Tier 1 deterministic assertions; Tier 2 judge | `npm run eval -- --tier 1 --ci` in CI | Tier 1 failure blocks merge | 1–3 |
 | G7 | No scenario or assertion removed without an `Eval-change:` trailer | `scripts/check-eval-integrity.ts`, CI | Deleting an assertion fails CI | 3 |
-| G8 | Production smoke test against the deployed URL | Playwright, GitHub Action on `deployment_status` | Smoke runs green after each deploy | 1 |
+| G8 | Production smoke test against the deployed URL | Playwright, GitHub Action on push to `main`, after `/api/version` serves the commit (D8) | Smoke runs green after each deploy | 1 |
 | G9 | Edited files lint clean; typecheck passes before Claude stops | `.claude/settings.json` PostToolUse and Stop hooks | A type error makes Claude fix it before stopping | 0 |
 | G10 | Submission zip: `git log` works, gitleaks clean on files and history, a few MB, CLAUDE.md and plan.md at root | Manual script at wrap | All five checks pass on the extracted zip | Wrap |
 

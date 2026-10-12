@@ -53,3 +53,31 @@ Template:
 - Rejected: Cadre key in production from 0:12 (about 3 hours exposed with no limits); Cadre key for evals (Sonnet judge runs and the model comparison would spend most of it).
 - Evidence: OpenRouter pricing 2026-10-12: Haiku 5.5 $0.10/$0.50 per million tokens (cached input $0.01); Sonnet 5.5 $2/$10. Estimated full Tier 1 run about $0.03 on Haiku.
 - Revisit when: Cadre states the key's intended use or raises its limit.
+
+## D8: G8 smoke runs on push to main, gated on the live commit
+- Context: the runbook triggered G8 on GitHub's `deployment_status` event, but Vercel creates no GitHub deployment records for this repo (2026-10-12: `GET /repos/.../deployments` returned 0), so that trigger never fires.
+- Decision: `.github/workflows/smoke.yml` runs on `push` to `main` and `workflow_dispatch`. It polls `/api/version` until production serves `GITHUB_SHA` (5-minute timeout), then runs Playwright against the production URL.
+- Rejected: a fixed sleep (flaky either way); `deployment_status` (never fires); a cron (doesn't tie the check to a deploy).
+- Evidence: zero deployment records and no commit statuses on HEAD at 09:40.
+- Revisit when: the Vercel GitHub app posts deployments for this repo; switch back to `deployment_status`.
+
+## D9: The AI Transformation Intensive is 45 days; the construction page's 60 days is dropped
+- Context: /strategy titles the Intensive "From Idea to Execution in 45 Days"; /industries/construction says Cadre "defines an AI strategy in 60 days". The baseline eval bot quoted both and called them inconsistent.
+- Decision: the offering's own page wins. `knowledge/construction.md` keeps the rest of that sentence without the day count.
+- Rejected: quoting both (exposes Cadre's inconsistency to prospects and gives no answer).
+- Evidence: Tier 1 `strategy-intensive-length` failed on the baseline ("60 days"), passes after.
+- Revisit when: Cadre confirms which figure is current.
+
+## D10: No client or solution counts in the knowledge base
+- Context: /about says "50+ companies" and "100+ high-ROI use cases"; /industries/construction says "200+ mid-market clients served" and "450+ solutions deployed".
+- Decision: state none of them; the bot says it has no confirmed count and offers the team. Added to the questions for Cadre.
+- Rejected: picking the larger (unsupported) or listing both (the baseline bot did this).
+- Evidence: Tier 1 `company-size` failed on the baseline ("50+ companies"), passes after.
+- Revisit when: Cadre gives one canonical figure.
+
+## D11: No third-party statistics; the Anthropic banner is quoted, not upgraded
+- Context: the homepage FAQ says "According to MIT, over 90% of AI initiatives fail"; /about cites "State of AI in Business 2025, MIT" for "300% higher" success with vendors; /industries/construction cites a white paper (61%, 45%, 50%, 4.4%). We can't verify those attributions from Cadre's pages, and a support bot repeating a misattributed statistic is a brand risk. The homepage banner says "Anthropic & OpenAI Partner"; only OpenAI has an announcement ("Official Service Partner", 2026-01-05).
+- Decision: drop all third-party statistics and the uncited "three times more likely" claim. Quote the Anthropic banner verbatim and reserve "Official Service Partner" for OpenAI.
+- Rejected: repeating the figures with "according to Cadre's site" (still spreads an unverified number).
+- Evidence: Tier 1 `mit-statistic` and `anthropic-partner` failed on the baseline; both pass after (eval run 947ce5f04089, 14/14).
+- Revisit when: Cadre supplies the primary sources or confirms the Anthropic relationship.

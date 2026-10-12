@@ -1,2 +1,5 @@
 # G1: refuse commits containing secrets.
 gitleaks protect --staged --redact
+
+# G3: knowledge schema.
+npm run check:kb
