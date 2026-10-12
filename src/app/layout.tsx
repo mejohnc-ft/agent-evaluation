@@ -5,8 +5,17 @@ import "./globals.css";
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
-  title: "Cadre AI Assistant",
+  metadataBase: new URL("https://agent-evaluation-five.vercel.app"),
+  title: { default: "Cadre AI Assistant", template: "%s · Cadre AI Assistant" },
   description: "Ask about Cadre AI's services, industries, and how to work with the team.",
+  openGraph: {
+    title: "Cadre AI Assistant",
+    description: "Ask about Cadre AI's services, industries, and how to work with the team.",
+    type: "website",
+    siteName: "Cadre AI Assistant",
+  },
+  twitter: { card: "summary_large_image" },
+  robots: { index: false, follow: false }, // demo deployment
 };
 
 export const viewport: Viewport = {
