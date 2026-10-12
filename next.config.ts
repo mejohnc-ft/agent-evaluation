@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
   // The prompt builder reads these at runtime (src/lib/prompt/build.ts).
   outputFileTracingIncludes: {
     "/api/chat": ["./knowledge/*.md", "./src/lib/prompt/system.md"],
+    "/api/sources": ["./knowledge/*.md"],
   },
   turbopack: {
     rules: {
